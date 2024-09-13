@@ -1,0 +1,23 @@
+name: "changesets-canary-publish"
+description: "changesets canary publish"
+runs:
+    using: "node16"
+    main: "dist/index.js"
+inputs:
+    github_token:
+        description: "github token"
+        required: true
+    npm_tag:
+        description: "npm tag"
+        default: canary
+        required: false
+    npm_token:
+        description: "npm token"
+        required: true
+    publish_script:
+        description: "canary deploy script"
+        required: true
+    packages_dir:
+        description: "패키지 디렉터리"
+        required: false
+        default: "packages,share"

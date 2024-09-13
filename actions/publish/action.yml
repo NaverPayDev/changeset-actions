@@ -1,0 +1,39 @@
+name: "changesets-detect-add"
+description: ""
+runs:
+    using: "node16"
+    main: "dist/index.js"
+inputs:
+    github_token:
+        description: "get github token (필요하면 user의 PAT을 넣어주세요.)"
+        required: true
+    npm_token:
+        description: "npm publish token"
+        required: true
+    publish_script:
+        description: "배포 script"
+        required: false
+    git_username:
+        description: "pr 생성시 설정할 github username"
+        required: false
+        default: 'npay-fe-bot'
+    git_email:
+        description: "pr 생성시 설정할 github email"
+        required: false
+        default: 'npay.fe.bot@navercorp.com'
+    pr_title:
+        description: "pr 의 타이틀"
+        required: false
+        default: '🚀 version changed packages'
+    commit_message:
+        description: "커밋 메시지"
+        required: false
+        default: '📦 bump changed packages version'
+    create_github_release_tag:
+        description: "release tag 생성여부"
+        required: false
+        default: true
+    formatting_script:
+        description: ".changeset/*.md 파일 포매팅이 필요하다면 script 명령어를 추가해주세요"
+        required: false
+        
