@@ -6,11 +6,14 @@
 
 ## 관리 중인 액션 목록
 
-#### detect add
+### detect add
+
 PR의 변경점을 파악하여 `.changeset` 하위에 변경된 파일에 대한 정보를 기재할 수 있도록 유도하는 action
 
-#### canary 
+### canary
+
 `.changeset` 하위 변경된 패키지들의 안전성을 테스트하기 위해 canary 버전으로 배포를 도와주는 action
 
-#### publish 
-`.changeset` 하위에 변경된 패키지들을 배포하고 자동으로 CHANGELOG 를 작성해주는 action 
+### publish
+
+`.changeset` 하위에 변경된 패키지들을 배포하고 자동으로 CHANGELOG 를 작성해주는 action
