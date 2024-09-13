@@ -27,7 +27,7 @@ jobs:
             - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
-            - uses: NaverPayDev/@naverpay/changeset-actions/publish@main
+            - uses: NaverPayDev/changeset-actions/actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   npm_token: ${{ secrets.NPM_TOKEN }} # npm 배포시 필요한 publish token 을 넣어주세요 

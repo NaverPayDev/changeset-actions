@@ -65239,457 +65239,6 @@ function Node (value, prev, next, list) {
 
 /***/ }),
 
-/***/ 12613:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const utils_1 = __nccwpck_require__(89130);
-const issueFetchers_1 = __importDefault(__nccwpck_require__(42046));
-const pullFetchers_1 = __importDefault(__nccwpck_require__(95963));
-const repoFetchers_1 = __importDefault(__nccwpck_require__(93228));
-const octokitRestCommonParams = (0, utils_1.getOctokitRestCommonParams)();
-const createFetchers = () => {
-    return {
-        issueFetchers: (0, issueFetchers_1.default)(octokitRestCommonParams),
-        pullFetchers: (0, pullFetchers_1.default)(octokitRestCommonParams),
-        repoFetchers: (0, repoFetchers_1.default)(octokitRestCommonParams),
-    };
-};
-exports["default"] = createFetchers;
-
-
-/***/ }),
-
-/***/ 42046:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(14237));
-const github = __importStar(__nccwpck_require__(47131));
-const createIssueFetchers = (octokitRestCommonParams) => {
-    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-    const octokit = github.getOctokit(GITHUB_TOKEN);
-    const issueApi = octokit.rest.issues;
-    const { issue: { number: issue_number }, } = github.context;
-    /**
-     * 이슈를 생성합니다.
-     * see) https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#create-an-issue
-     */
-    const createIssue = (params) => __awaiter(void 0, void 0, void 0, function* () {
-        issueApi.create(Object.assign(Object.assign({}, octokitRestCommonParams), params));
-    });
-    /**
-     * 이슈를 업데이트 합니다.
-     * see) https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#update-an-issue
-     */
-    const updateIssue = (_a) => __awaiter(void 0, void 0, void 0, function* () {
-        var { issueNumber } = _a, restParams = __rest(_a, ["issueNumber"]);
-        issueApi.update(Object.assign(Object.assign(Object.assign({}, octokitRestCommonParams), { issue_number: issueNumber }), restParams));
-    });
-    /**
-     * 이슈에 comment를 추가합니다.
-     * see) https://docs.github.com/ko/rest/issues/comments?apiVersion=2022-11-28#create-an-issue-comment
-     */
-    const addComment = (body) => __awaiter(void 0, void 0, void 0, function* () {
-        issueApi.createComment(Object.assign(Object.assign({}, octokitRestCommonParams), { issue_number, body }));
-    });
-    return {
-        createIssue,
-        updateIssue,
-        addComment,
-    };
-};
-exports["default"] = createIssueFetchers;
-
-
-/***/ }),
-
-/***/ 95963:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(14237));
-const github = __importStar(__nccwpck_require__(47131));
-const createPullFetchers = (octokitRestCommonParams) => {
-    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-    const pullApi = github.getOctokit(GITHUB_TOKEN).rest.pulls;
-    const { issue: { number: pull_number }, } = github.context;
-    /**
-     * pull request 정보를 가져옵니다.
-     * see) https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request
-     */
-    const getPullRequestInfo = () => __awaiter(void 0, void 0, void 0, function* () {
-        const { data: pullInfo } = yield pullApi.get(Object.assign(Object.assign({}, octokitRestCommonParams), { pull_number }));
-        return pullInfo;
-    });
-    return { getPullRequestInfo };
-};
-exports["default"] = createPullFetchers;
-
-
-/***/ }),
-
-/***/ 93228:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(14237));
-const github = __importStar(__nccwpck_require__(47131));
-const createRepoFetchers = (octokitRestCommonParams) => {
-    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-    const octokit = github.getOctokit(GITHUB_TOKEN);
-    const repoApi = octokit.rest.repos;
-    /**
-     * 레포 정보를 가져옵니다
-     * see) https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#get-a-repository
-     */
-    const getRepoInfo = () => __awaiter(void 0, void 0, void 0, function* () {
-        const { data: repoInfo } = yield repoApi.get(Object.assign({}, octokitRestCommonParams));
-        return repoInfo;
-    });
-    const createRelease = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, tagName, body, prerelease, }) {
-        yield octokit.rest.repos.createRelease(Object.assign({ name, tag_name: tagName, body,
-            prerelease }, octokitRestCommonParams));
-    });
-    return { getRepoInfo, createRelease };
-};
-exports["default"] = createRepoFetchers;
-
-
-/***/ }),
-
-/***/ 35003:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getChangedAllFiles = getChangedAllFiles;
-const core = __importStar(__nccwpck_require__(14237));
-const github = __importStar(__nccwpck_require__(47131));
-const utils_1 = __nccwpck_require__(89130);
-function getChangedAllFiles(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
-        var _b, e_1, _c, _d;
-        const githubToken = core.getInput('github_token');
-        const octokit = github.getOctokit(githubToken);
-        const { owner, repo } = (0, utils_1.getOctokitRestCommonParams)();
-        const changedFiles = [];
-        try {
-            for (var _e = true, _f = __asyncValues(octokit.paginate.iterator(octokit.rest.pulls.listFiles, {
-                owner,
-                repo,
-                pull_number: pullNumber,
-                per_page: 100,
-            })), _g; _g = yield _f.next(), _b = _g.done, !_b; _e = true) {
-                _d = _g.value;
-                _e = false;
-                const response = _d;
-                changedFiles.push(...response.data);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (!_e && !_b && (_c = _f.return)) yield _c.call(_f);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return changedFiles;
-    });
-}
-
-
-/***/ }),
-
-/***/ 70612:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.pushTags = exports.checkIfClean = exports.commitAll = exports.reset = exports.switchBranch = exports.push = exports.setGithubUserInfo = void 0;
-const exec_1 = __nccwpck_require__(78649);
-const setGithubUserInfo = (_a) => __awaiter(void 0, [_a], void 0, function* ({ repoUrl, githubToken, username, email, }) {
-    yield (0, exec_1.exec)('git', ['config', '--global', 'user.name', username]);
-    yield (0, exec_1.exec)('git', ['config', '--global', 'user.email', email]);
-    yield (0, exec_1.exec)('git', ['remote', 'set-url', 'origin', `https://x-access-token:${githubToken}@${repoUrl}`]);
-});
-exports.setGithubUserInfo = setGithubUserInfo;
-const push = (branch_1, ...args_1) => __awaiter(void 0, [branch_1, ...args_1], void 0, function* (branch, { force } = {}) {
-    yield (0, exec_1.exec)('git', ['push', 'origin', `HEAD:${branch}`, force && '--force'].filter(Boolean));
-});
-exports.push = push;
-const switchBranch = (branch) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, exec_1.exec)('git', ['switch', branch]);
-    }
-    catch (error) {
-        yield (0, exec_1.exec)('git', ['switch', '-c', branch]);
-    }
-});
-exports.switchBranch = switchBranch;
-const reset = (pathSpec_1, ...args_1) => __awaiter(void 0, [pathSpec_1, ...args_1], void 0, function* (pathSpec, mode = 'hard') {
-    yield (0, exec_1.exec)('git', ['reset', `--${mode}`, pathSpec]);
-});
-exports.reset = reset;
-const commitAll = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, exec_1.exec)('git', ['add', '.']);
-    yield (0, exec_1.exec)('git', ['commit', '-m', message]);
-});
-exports.commitAll = commitAll;
-const checkIfClean = () => __awaiter(void 0, void 0, void 0, function* () {
-    const { stdout } = yield (0, exec_1.getExecOutput)('git', ['status', '--porcelain']);
-    return !stdout.length;
-});
-exports.checkIfClean = checkIfClean;
-const pushTags = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, exec_1.exec)('git', ['push', 'origin', '--tags'], {
-        silent: true,
-        ignoreReturnCode: true,
-    });
-});
-exports.pushTags = pushTags;
-
-
-/***/ }),
-
-/***/ 89130:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getOctokitRestCommonParams = void 0;
-const github = __importStar(__nccwpck_require__(47131));
-const getOctokitRestCommonParams = () => {
-    const { repo: { owner, repo }, ref, } = github.context;
-    return { owner, repo, ref };
-};
-exports.getOctokitRestCommonParams = getOctokitRestCommonParams;
-__exportStar(__nccwpck_require__(70612), exports);
-__exportStar(__nccwpck_require__(35003), exports);
-__exportStar(__nccwpck_require__(61173), exports);
-
-
-/***/ }),
-
-/***/ 61173:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.uniqBy = uniqBy;
-function uniqBy(arr, hasher) {
-    const result = [];
-    const addedElements = new Set();
-    for (const item of arr) {
-        const hash = hasher(item);
-        if (addedElements.has(hash)) {
-            continue;
-        }
-        addedElements.add(hash);
-        result.push(item);
-    }
-    return result;
-}
-
-
-/***/ }),
-
 /***/ 30906:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -66305,6 +65854,457 @@ function runVersion(_a) {
             };
         }
     });
+}
+
+
+/***/ }),
+
+/***/ 12613:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const utils_1 = __nccwpck_require__(89130);
+const issueFetchers_1 = __importDefault(__nccwpck_require__(42046));
+const pullFetchers_1 = __importDefault(__nccwpck_require__(95963));
+const repoFetchers_1 = __importDefault(__nccwpck_require__(93228));
+const octokitRestCommonParams = (0, utils_1.getOctokitRestCommonParams)();
+const createFetchers = () => {
+    return {
+        issueFetchers: (0, issueFetchers_1.default)(octokitRestCommonParams),
+        pullFetchers: (0, pullFetchers_1.default)(octokitRestCommonParams),
+        repoFetchers: (0, repoFetchers_1.default)(octokitRestCommonParams),
+    };
+};
+exports["default"] = createFetchers;
+
+
+/***/ }),
+
+/***/ 42046:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(14237));
+const github = __importStar(__nccwpck_require__(47131));
+const createIssueFetchers = (octokitRestCommonParams) => {
+    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+    const octokit = github.getOctokit(GITHUB_TOKEN);
+    const issueApi = octokit.rest.issues;
+    const { issue: { number: issue_number }, } = github.context;
+    /**
+     * 이슈를 생성합니다.
+     * see) https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#create-an-issue
+     */
+    const createIssue = (params) => __awaiter(void 0, void 0, void 0, function* () {
+        issueApi.create(Object.assign(Object.assign({}, octokitRestCommonParams), params));
+    });
+    /**
+     * 이슈를 업데이트 합니다.
+     * see) https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#update-an-issue
+     */
+    const updateIssue = (_a) => __awaiter(void 0, void 0, void 0, function* () {
+        var { issueNumber } = _a, restParams = __rest(_a, ["issueNumber"]);
+        issueApi.update(Object.assign(Object.assign(Object.assign({}, octokitRestCommonParams), { issue_number: issueNumber }), restParams));
+    });
+    /**
+     * 이슈에 comment를 추가합니다.
+     * see) https://docs.github.com/ko/rest/issues/comments?apiVersion=2022-11-28#create-an-issue-comment
+     */
+    const addComment = (body) => __awaiter(void 0, void 0, void 0, function* () {
+        issueApi.createComment(Object.assign(Object.assign({}, octokitRestCommonParams), { issue_number, body }));
+    });
+    return {
+        createIssue,
+        updateIssue,
+        addComment,
+    };
+};
+exports["default"] = createIssueFetchers;
+
+
+/***/ }),
+
+/***/ 95963:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(14237));
+const github = __importStar(__nccwpck_require__(47131));
+const createPullFetchers = (octokitRestCommonParams) => {
+    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+    const pullApi = github.getOctokit(GITHUB_TOKEN).rest.pulls;
+    const { issue: { number: pull_number }, } = github.context;
+    /**
+     * pull request 정보를 가져옵니다.
+     * see) https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request
+     */
+    const getPullRequestInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+        const { data: pullInfo } = yield pullApi.get(Object.assign(Object.assign({}, octokitRestCommonParams), { pull_number }));
+        return pullInfo;
+    });
+    return { getPullRequestInfo };
+};
+exports["default"] = createPullFetchers;
+
+
+/***/ }),
+
+/***/ 93228:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(14237));
+const github = __importStar(__nccwpck_require__(47131));
+const createRepoFetchers = (octokitRestCommonParams) => {
+    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+    const octokit = github.getOctokit(GITHUB_TOKEN);
+    const repoApi = octokit.rest.repos;
+    /**
+     * 레포 정보를 가져옵니다
+     * see) https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#get-a-repository
+     */
+    const getRepoInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+        const { data: repoInfo } = yield repoApi.get(Object.assign({}, octokitRestCommonParams));
+        return repoInfo;
+    });
+    const createRelease = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, tagName, body, prerelease, }) {
+        yield octokit.rest.repos.createRelease(Object.assign({ name, tag_name: tagName, body,
+            prerelease }, octokitRestCommonParams));
+    });
+    return { getRepoInfo, createRelease };
+};
+exports["default"] = createRepoFetchers;
+
+
+/***/ }),
+
+/***/ 35003:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getChangedAllFiles = getChangedAllFiles;
+const core = __importStar(__nccwpck_require__(14237));
+const github = __importStar(__nccwpck_require__(47131));
+const utils_1 = __nccwpck_require__(89130);
+function getChangedAllFiles(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
+        var _b, e_1, _c, _d;
+        const githubToken = core.getInput('github_token');
+        const octokit = github.getOctokit(githubToken);
+        const { owner, repo } = (0, utils_1.getOctokitRestCommonParams)();
+        const changedFiles = [];
+        try {
+            for (var _e = true, _f = __asyncValues(octokit.paginate.iterator(octokit.rest.pulls.listFiles, {
+                owner,
+                repo,
+                pull_number: pullNumber,
+                per_page: 100,
+            })), _g; _g = yield _f.next(), _b = _g.done, !_b; _e = true) {
+                _d = _g.value;
+                _e = false;
+                const response = _d;
+                changedFiles.push(...response.data);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_e && !_b && (_c = _f.return)) yield _c.call(_f);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return changedFiles;
+    });
+}
+
+
+/***/ }),
+
+/***/ 70612:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.pushTags = exports.checkIfClean = exports.commitAll = exports.reset = exports.switchBranch = exports.push = exports.setGithubUserInfo = void 0;
+const exec_1 = __nccwpck_require__(78649);
+const setGithubUserInfo = (_a) => __awaiter(void 0, [_a], void 0, function* ({ repoUrl, githubToken, username, email, }) {
+    yield (0, exec_1.exec)('git', ['config', '--global', 'user.name', username]);
+    yield (0, exec_1.exec)('git', ['config', '--global', 'user.email', email]);
+    yield (0, exec_1.exec)('git', ['remote', 'set-url', 'origin', `https://x-access-token:${githubToken}@${repoUrl}`]);
+});
+exports.setGithubUserInfo = setGithubUserInfo;
+const push = (branch_1, ...args_1) => __awaiter(void 0, [branch_1, ...args_1], void 0, function* (branch, { force } = {}) {
+    yield (0, exec_1.exec)('git', ['push', 'origin', `HEAD:${branch}`, force && '--force'].filter(Boolean));
+});
+exports.push = push;
+const switchBranch = (branch) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, exec_1.exec)('git', ['switch', branch]);
+    }
+    catch (error) {
+        yield (0, exec_1.exec)('git', ['switch', '-c', branch]);
+    }
+});
+exports.switchBranch = switchBranch;
+const reset = (pathSpec_1, ...args_1) => __awaiter(void 0, [pathSpec_1, ...args_1], void 0, function* (pathSpec, mode = 'hard') {
+    yield (0, exec_1.exec)('git', ['reset', `--${mode}`, pathSpec]);
+});
+exports.reset = reset;
+const commitAll = (message) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, exec_1.exec)('git', ['add', '.']);
+    yield (0, exec_1.exec)('git', ['commit', '-m', message]);
+});
+exports.commitAll = commitAll;
+const checkIfClean = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { stdout } = yield (0, exec_1.getExecOutput)('git', ['status', '--porcelain']);
+    return !stdout.length;
+});
+exports.checkIfClean = checkIfClean;
+const pushTags = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, exec_1.exec)('git', ['push', 'origin', '--tags'], {
+        silent: true,
+        ignoreReturnCode: true,
+    });
+});
+exports.pushTags = pushTags;
+
+
+/***/ }),
+
+/***/ 89130:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getOctokitRestCommonParams = void 0;
+const github = __importStar(__nccwpck_require__(47131));
+const getOctokitRestCommonParams = () => {
+    const { repo: { owner, repo }, ref, } = github.context;
+    return { owner, repo, ref };
+};
+exports.getOctokitRestCommonParams = getOctokitRestCommonParams;
+__exportStar(__nccwpck_require__(70612), exports);
+__exportStar(__nccwpck_require__(35003), exports);
+__exportStar(__nccwpck_require__(61173), exports);
+
+
+/***/ }),
+
+/***/ 61173:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.uniqBy = uniqBy;
+function uniqBy(arr, hasher) {
+    const result = [];
+    const addedElements = new Set();
+    for (const item of arr) {
+        const hash = hasher(item);
+        if (addedElements.has(hash)) {
+            continue;
+        }
+        addedElements.add(hash);
+        result.push(item);
+    }
+    return result;
 }
 
 

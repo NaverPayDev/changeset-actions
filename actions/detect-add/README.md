@@ -24,7 +24,7 @@ jobs:
             - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
-            - uses: NaverPayDev/@naverpay/changeset-actions/detect-add@main
+            - uses: NaverPayDev/changeset-actions/actions/detect-add@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   skip_branches: main # skip할 브랜치들을 적어주세요. (default : master,main,develop) 

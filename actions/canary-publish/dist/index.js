@@ -53206,6 +53206,337 @@ function Node (value, prev, next, list) {
 
 /***/ }),
 
+/***/ 1199:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(4237));
+const exec_1 = __nccwpck_require__(4260);
+const read_1 = __importDefault(__nccwpck_require__(5589));
+const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
+const resolve_from_1 = __importDefault(__nccwpck_require__(2883));
+const apis_1 = __importDefault(__nccwpck_require__(2613));
+const file_1 = __nccwpck_require__(9496);
+const npm_1 = __nccwpck_require__(9202);
+const publish_1 = __nccwpck_require__(6066);
+const cwd = process.cwd();
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // npmrc 설정
+        yield (0, npm_1.setNpmRc)();
+        const { pullFetchers, issueFetchers } = (0, apis_1.default)();
+        const pullRequestInfo = yield pullFetchers.getPullRequestInfo();
+        try {
+            // 변경된 사항이 있는지 체크.
+            // 변경사항이 있을때만 카나리를 배포 할 수 있다.
+            const changesets = yield (0, read_1.default)(cwd);
+            if (changesets.length === 0) {
+                yield issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요');
+                return;
+            }
+            // 변경된 패키지 파일을 가져온다
+            const packagesDir = core.getInput('packages_dir');
+            const changedPackageInfos = yield (0, file_1.getChangedPackages)({
+                pullNumber: pullRequestInfo.number,
+                packagesDir: packagesDir.split(','),
+            });
+            if (changedPackageInfos.length === 0) {
+                core.info('변경된 패키지가 없습니다.');
+                return;
+            }
+            // 변경사항외 다른 패키지들의 배포를 막습니다.
+            yield (0, file_1.protectUnchangedPackages)(changedPackageInfos);
+            // 패키지 변경 버전 반영
+            yield (0, exec_1.exec)('node', [(0, resolve_from_1.default)(cwd, '@changesets/cli/bin.js'), 'version'], {
+                cwd,
+            });
+            // publish 스크립트에 태그를 붙여줍니다.
+            const npmTag = core.getInput('npm_tag');
+            const rootPackageJsonPath = `package.json`;
+            const rootPackageJson = JSON.parse(fs_extra_1.default.readFileSync(rootPackageJsonPath, 'utf8'));
+            for (const [key, script] of Object.entries(rootPackageJson.scripts)) {
+                if (script.includes('changeset publish')) {
+                    // 카나리배포는 태그를 남기지 않습니다
+                    if (!script.includes('--no-git-tag')) {
+                        rootPackageJson.scripts[key] = script.replace('changeset publish', 'changeset publish --no-git-tag');
+                    }
+                    // 카나리배포는 npmTag 태그를 추가합니다
+                    if (!script.includes('--tag')) {
+                        rootPackageJson.scripts[key] = script.replace('--no-git-tag', `--no-git-tag --tag=${npmTag}`);
+                    }
+                }
+            }
+            fs_extra_1.default.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
+            // 변경된 패키지들의 버전을 강제로 치환합니다
+            changedPackageInfos.forEach((packageJsonPath) => {
+                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
+                const newVersion = `${packageJson.version}-${npmTag}-${pullRequestInfo.head.sha.slice(0, 7)}`;
+                core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
+                packageJson.version = newVersion;
+                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+            });
+            // 변경된 버전으로 카나리 배포
+            const publishScript = core.getInput('publish_script');
+            const [publishCommand, ...publishArgs] = publishScript.split(/\s+/);
+            // 배포 스크립트 실행
+            const changesetPublishOutput = yield (0, exec_1.getExecOutput)(publishCommand, [...publishArgs], { cwd });
+            // 배포된 패키지들의 정보와 배포 메세지를 가져옵니다
+            const { message, publishedPackages } = (0, publish_1.getPublishedPackageInfos)({
+                execOutput: changesetPublishOutput,
+                packagesDir,
+            });
+            // 배포 완료 코멘트
+            yield issueFetchers.addComment(message);
+            // output 설정
+            core.setOutput('published', 'true');
+            core.setOutput('publishedPackages', JSON.stringify(publishedPackages));
+            core.setOutput('message', message);
+        }
+        catch (e) {
+            issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.');
+        }
+    });
+}
+main();
+
+
+/***/ }),
+
+/***/ 9496:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getChangedPackages = getChangedPackages;
+exports.getAllPackageJSON = getAllPackageJSON;
+exports.protectUnchangedPackages = protectUnchangedPackages;
+const core = __importStar(__nccwpck_require__(4237));
+const fast_glob_1 = __importDefault(__nccwpck_require__(5470));
+const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
+const utils_1 = __nccwpck_require__(9130);
+function getChangedPackages(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ pullNumber, packagesDir }) {
+        const changedFiles = yield (0, utils_1.getChangedAllFiles)({
+            pullNumber,
+        });
+        const changedPackages = changedFiles.reduce((acc, { filename }) => {
+            const isTargetDirectories = packagesDir.some((packageDir) => filename.includes(`${packageDir}/`));
+            const isMarkdownFile = filename.endsWith('.md');
+            if (isTargetDirectories && !isMarkdownFile) {
+                const [packageRoot, packageName] = filename.split('/');
+                const packageJsonPath = [packageRoot, packageName, 'package.json'].join('/');
+                acc.push(packageJsonPath);
+            }
+            return acc;
+        }, []);
+        return [...new Set(changedPackages)];
+    });
+}
+function getAllPackageJSON() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const paths = yield (0, fast_glob_1.default)('**/package.json', {
+            ignore: ['**/node_modules/**'],
+        });
+        return paths;
+    });
+}
+function protectUnchangedPackages(changedPackages) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const allPackageJSON = yield getAllPackageJSON();
+        for (const packageJsonPath of allPackageJSON) {
+            if (!changedPackages.includes(packageJsonPath)) {
+                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
+                core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`);
+                packageJson.private = true;
+                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+            }
+        }
+    });
+}
+
+
+/***/ }),
+
+/***/ 9202:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.setNpmRc = setNpmRc;
+const core = __importStar(__nccwpck_require__(4237));
+const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
+function setNpmRc() {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.info('No changesets found, attempting to publish any unpublished packages to npm');
+        const userNpmrcPath = `${process.env.HOME}/.npmrc`;
+        if (fs_extra_1.default.existsSync(userNpmrcPath)) {
+            core.info('Found existing user .npmrc file');
+            const userNpmrcContent = yield fs_extra_1.default.readFile(userNpmrcPath, 'utf8');
+            const authLine = userNpmrcContent.split('\n').find((line) => {
+                // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
+                return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
+            });
+            if (authLine) {
+                core.info('Found existing auth token for the npm registry in the user .npmrc file');
+            }
+            else {
+                core.info("Didn't find existing auth token for the npm registry in the user .npmrc file, creating one");
+                fs_extra_1.default.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
+            }
+        }
+        else {
+            core.info('No user .npmrc file found, creating one');
+            fs_extra_1.default.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
+        }
+    });
+}
+
+
+/***/ }),
+
+/***/ 6066:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPublishedPackageInfos = getPublishedPackageInfos;
+const utils_1 = __nccwpck_require__(9130);
+function getPublishedPackageInfos({ packagesDir, execOutput }) {
+    const publishedPackages = [];
+    for (const publishOutput of execOutput.stdout.split('\n')) {
+        // eslint-disable-next-line no-useless-escape
+        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(\d+\.\d+\.\d+\-[A-Za-z]+\-\w{7})$/;
+        const matchResult = publishOutput.trim().match(regExp);
+        if (!matchResult) {
+            continue;
+        }
+        const [, , name, version] = matchResult;
+        publishedPackages.push({ name: name.slice(0, -1), version });
+    }
+    const uniqPackages = (0, utils_1.uniqBy)(publishedPackages, ({ name }) => name);
+    const copyCodeBlock = uniqPackages.map(({ name, version }) => `${name}@${version}`).join('\n');
+    const message = uniqPackages.length > 0
+        ? ['## Published Canary Packages', '', '', '```', `${copyCodeBlock}`, '```'].join('\n')
+        : `${packagesDir} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.`;
+    return {
+        message,
+        publishedPackages: uniqPackages,
+    };
+}
+
+
+/***/ }),
+
 /***/ 2613:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -53652,337 +53983,6 @@ function uniqBy(arr, hasher) {
         result.push(item);
     }
     return result;
-}
-
-
-/***/ }),
-
-/***/ 1199:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(4237));
-const exec_1 = __nccwpck_require__(4260);
-const read_1 = __importDefault(__nccwpck_require__(5589));
-const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
-const resolve_from_1 = __importDefault(__nccwpck_require__(2883));
-const apis_1 = __importDefault(__nccwpck_require__(2613));
-const file_1 = __nccwpck_require__(9496);
-const npm_1 = __nccwpck_require__(9202);
-const publish_1 = __nccwpck_require__(6066);
-const cwd = process.cwd();
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // npmrc 설정
-        yield (0, npm_1.setNpmRc)();
-        const { pullFetchers, issueFetchers } = (0, apis_1.default)();
-        const pullRequestInfo = yield pullFetchers.getPullRequestInfo();
-        try {
-            // 변경된 사항이 있는지 체크.
-            // 변경사항이 있을때만 카나리를 배포 할 수 있다.
-            const changesets = yield (0, read_1.default)(cwd);
-            if (changesets.length === 0) {
-                yield issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요');
-                return;
-            }
-            // 변경된 패키지 파일을 가져온다
-            const packagesDir = core.getInput('packages_dir');
-            const changedPackageInfos = yield (0, file_1.getChangedPackages)({
-                pullNumber: pullRequestInfo.number,
-                packagesDir: packagesDir.split(','),
-            });
-            if (changedPackageInfos.length === 0) {
-                core.info('변경된 패키지가 없습니다.');
-                return;
-            }
-            // 변경사항외 다른 패키지들의 배포를 막습니다.
-            yield (0, file_1.protectUnchangedPackages)(changedPackageInfos);
-            // 패키지 변경 버전 반영
-            yield (0, exec_1.exec)('node', [(0, resolve_from_1.default)(cwd, '@changesets/cli/bin.js'), 'version'], {
-                cwd,
-            });
-            // publish 스크립트에 태그를 붙여줍니다.
-            const npmTag = core.getInput('npm_tag');
-            const rootPackageJsonPath = `package.json`;
-            const rootPackageJson = JSON.parse(fs_extra_1.default.readFileSync(rootPackageJsonPath, 'utf8'));
-            for (const [key, script] of Object.entries(rootPackageJson.scripts)) {
-                if (script.includes('changeset publish')) {
-                    // 카나리배포는 태그를 남기지 않습니다
-                    if (!script.includes('--no-git-tag')) {
-                        rootPackageJson.scripts[key] = script.replace('changeset publish', 'changeset publish --no-git-tag');
-                    }
-                    // 카나리배포는 npmTag 태그를 추가합니다
-                    if (!script.includes('--tag')) {
-                        rootPackageJson.scripts[key] = script.replace('--no-git-tag', `--no-git-tag --tag=${npmTag}`);
-                    }
-                }
-            }
-            fs_extra_1.default.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
-            // 변경된 패키지들의 버전을 강제로 치환합니다
-            changedPackageInfos.forEach((packageJsonPath) => {
-                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
-                const newVersion = `${packageJson.version}-${npmTag}-${pullRequestInfo.head.sha.slice(0, 7)}`;
-                core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
-                packageJson.version = newVersion;
-                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
-            });
-            // 변경된 버전으로 카나리 배포
-            const publishScript = core.getInput('publish_script');
-            const [publishCommand, ...publishArgs] = publishScript.split(/\s+/);
-            // 배포 스크립트 실행
-            const changesetPublishOutput = yield (0, exec_1.getExecOutput)(publishCommand, [...publishArgs], { cwd });
-            // 배포된 패키지들의 정보와 배포 메세지를 가져옵니다
-            const { message, publishedPackages } = (0, publish_1.getPublishedPackageInfos)({
-                execOutput: changesetPublishOutput,
-                packagesDir,
-            });
-            // 배포 완료 코멘트
-            yield issueFetchers.addComment(message);
-            // output 설정
-            core.setOutput('published', 'true');
-            core.setOutput('publishedPackages', JSON.stringify(publishedPackages));
-            core.setOutput('message', message);
-        }
-        catch (e) {
-            issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.');
-        }
-    });
-}
-main();
-
-
-/***/ }),
-
-/***/ 9496:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getChangedPackages = getChangedPackages;
-exports.getAllPackageJSON = getAllPackageJSON;
-exports.protectUnchangedPackages = protectUnchangedPackages;
-const core = __importStar(__nccwpck_require__(4237));
-const fast_glob_1 = __importDefault(__nccwpck_require__(5470));
-const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
-const utils_1 = __nccwpck_require__(9130);
-function getChangedPackages(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ pullNumber, packagesDir }) {
-        const changedFiles = yield (0, utils_1.getChangedAllFiles)({
-            pullNumber,
-        });
-        const changedPackages = changedFiles.reduce((acc, { filename }) => {
-            const isTargetDirectories = packagesDir.some((packageDir) => filename.includes(`${packageDir}/`));
-            const isMarkdownFile = filename.endsWith('.md');
-            if (isTargetDirectories && !isMarkdownFile) {
-                const [packageRoot, packageName] = filename.split('/');
-                const packageJsonPath = [packageRoot, packageName, 'package.json'].join('/');
-                acc.push(packageJsonPath);
-            }
-            return acc;
-        }, []);
-        return [...new Set(changedPackages)];
-    });
-}
-function getAllPackageJSON() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const paths = yield (0, fast_glob_1.default)('**/package.json', {
-            ignore: ['**/node_modules/**'],
-        });
-        return paths;
-    });
-}
-function protectUnchangedPackages(changedPackages) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const allPackageJSON = yield getAllPackageJSON();
-        for (const packageJsonPath of allPackageJSON) {
-            if (!changedPackages.includes(packageJsonPath)) {
-                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
-                core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`);
-                packageJson.private = true;
-                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
-            }
-        }
-    });
-}
-
-
-/***/ }),
-
-/***/ 9202:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setNpmRc = setNpmRc;
-const core = __importStar(__nccwpck_require__(4237));
-const fs_extra_1 = __importDefault(__nccwpck_require__(9752));
-function setNpmRc() {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.info('No changesets found, attempting to publish any unpublished packages to npm');
-        const userNpmrcPath = `${process.env.HOME}/.npmrc`;
-        if (fs_extra_1.default.existsSync(userNpmrcPath)) {
-            core.info('Found existing user .npmrc file');
-            const userNpmrcContent = yield fs_extra_1.default.readFile(userNpmrcPath, 'utf8');
-            const authLine = userNpmrcContent.split('\n').find((line) => {
-                // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
-                return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
-            });
-            if (authLine) {
-                core.info('Found existing auth token for the npm registry in the user .npmrc file');
-            }
-            else {
-                core.info("Didn't find existing auth token for the npm registry in the user .npmrc file, creating one");
-                fs_extra_1.default.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
-            }
-        }
-        else {
-            core.info('No user .npmrc file found, creating one');
-            fs_extra_1.default.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
-        }
-    });
-}
-
-
-/***/ }),
-
-/***/ 6066:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPublishedPackageInfos = getPublishedPackageInfos;
-const utils_1 = __nccwpck_require__(9130);
-function getPublishedPackageInfos({ packagesDir, execOutput }) {
-    const publishedPackages = [];
-    for (const publishOutput of execOutput.stdout.split('\n')) {
-        // eslint-disable-next-line no-useless-escape
-        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(\d+\.\d+\.\d+\-[A-Za-z]+\-\w{7})$/;
-        const matchResult = publishOutput.trim().match(regExp);
-        if (!matchResult) {
-            continue;
-        }
-        const [, , name, version] = matchResult;
-        publishedPackages.push({ name: name.slice(0, -1), version });
-    }
-    const uniqPackages = (0, utils_1.uniqBy)(publishedPackages, ({ name }) => name);
-    const copyCodeBlock = uniqPackages.map(({ name, version }) => `${name}@${version}`).join('\n');
-    const message = uniqPackages.length > 0
-        ? ['## Published Canary Packages', '', '', '```', `${copyCodeBlock}`, '```'].join('\n')
-        : `${packagesDir} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.`;
-    return {
-        message,
-        publishedPackages: uniqPackages,
-    };
 }
 
 

@@ -39,7 +39,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Canary Publish
-              uses: NaverPayDev/@naverpay/changeset-actions/canary-publish@main
+              uses: NaverPayDev/changeset-actions/actions/canary-publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   npm_tag: canary # npm 배포 시 달아줄 태그는 무엇으로 할지적어주세요
