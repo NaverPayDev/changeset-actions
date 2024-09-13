@@ -1,21 +1,16 @@
 {
+    "extends": ["../../tsconfig.json"],
     "compilerOptions": {
-        "baseUrl": ".",
         "target": "ES2015",
-        "module": "CommonJS",
         "outDir": "./dist",
         "strict": true,
         "allowJs": true,
         "incremental": true,
         "declaration": true,
         "allowSyntheticDefaultImports": true,
-        "paths": {
-            "$actions/apis": ["libs/apis/index.ts"],
-            "$actions/types": ["libs/types/index.ts"],
-            "$actions/utils": ["libs/utils/index.ts"]
-        },
-        "types": ["node"]
+        "moduleResolution": "node"
     },
     "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-    "exclude": ["dist"]
+    "exclude": ["dist"],
+    "types": ["node"]
 }

@@ -1,0 +1,27 @@
+{
+    "name": "@naverpay/changeset-actions/canary-publish",
+    "description": "changeset 기반 publish action",
+    "sideEffects": false,
+    "version": "0.0.1",
+    "main": "./dist/index.js",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "npx ncc build src/index.ts -t",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@actions/exec": "^1.1.1",
+        "@changesets/cli": "^2.20.0",
+        "@changesets/read": "^0.6.0",
+        "@vercel/ncc": "^0.38.1",
+        "fast-glob": "^3.3.2",
+        "fs-extra": "^8.1.0",
+        "resolve-from": "^5.0.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^8.0.0",
+        "@types/node": "^20.14.9"
+    }
+}

@@ -1,5 +1,2 @@
 packages:
-    - 'pr/*'
-    - 'discussion/*'
-    - 'issue/*'
-    - 'repo/*'
+    - 'packages/*'

@@ -1,0 +1,22 @@
+{
+    "name": "@naverpay/changeset-actions/detect-add",
+    "description": "changeset 기반 detect add",
+    "sideEffects": false,
+    "version": "0.0.1",
+    "main": "./dist/index.js",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "npx ncc build src/index.ts -t",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@vercel/ncc": "^0.38.1",
+        "js-base64": "^3.7.5",
+        "human-id": "^4.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.9"
+    }
+}
