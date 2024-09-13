@@ -1,5 +1,5 @@
 {
-    "name": "@naverpay/changeset-actions/changesets/publish",
+    "name": "@naverpay/changeset-actions/publish",
     "description": "changeset 기반 publish",
     "sideEffects": false,
     "version": "0.0.1",

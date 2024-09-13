@@ -22,7 +22,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
     canary:
         if: ${{ github.event.issue.pull_request && (github.event.comment.body == 'canary-publish' || github.event.comment.body == '/canary-publish')}}
-        runs-on: common-fe
+        runs-on: ubuntu-latest
         steps:
             - name: Get PR branch name
               id: get_branch
@@ -39,7 +39,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Canary Publish
-              uses: common-fe/actions/changesets/canary-publish@feature/27_init_publish
+              uses: NaverPayDev/@naverpay/changeset-actions/canary-publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   npm_tag: canary # npm 배포 시 달아줄 태그는 무엇으로 할지적어주세요

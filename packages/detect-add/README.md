@@ -19,18 +19,18 @@ on:
 
 jobs:
     detectAdd:
-        runs-on: common-fe
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
-            - uses: common-fe/actions/changesets/detect-add@main
+            - uses: NaverPayDev/@naverpay/changeset-actions/detect-add@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   skip_branches: main # skip할 브랜치들을 적어주세요. (default : master,main,develop) 
                   skip_label: skip_detect_label # 해당 액션을 skip할 label의 이름을 적어주세요. (default: skip-detect-change) 
                   packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share) 
-            
+                  formatting_script: pnpm run markdownlint:fix # 생성되는 md 파일의 formatting이 필요하다면 추가해주세요
 ```
 
 ## 실행 결과

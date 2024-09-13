@@ -1,0 +1,35 @@
+name: Release Publish
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        env:
+            GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v2
+              with:
+                  token: ${{ env.GITHUB_TOKEN }}
+                  fetch-depth: 0
+
+            - name: install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Create Release Pull Request
+              id: changesets
+              uses: NaverPayDev/@naverpay/changeset-actions/detect-add@main
+              with:
+                  github_token: ${{ secrets.ACTION_TOKEN }}
+                  git_username: npay-fe-bot
+                  git_email: npay.fe.bot@navercorp.com
+                  publish_script: pnpm release
+                  pr_title: 🚀 version changed packages
+                  commit_message: 📦 bump changed packages version
+                  create_github_release_tag: true
+                  formatting_script: pnpm run markdownlint:fix

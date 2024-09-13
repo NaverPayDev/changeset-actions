@@ -1,0 +1,69 @@
+name: Canary Publish
+
+on:
+    issue_comment:
+        types:
+            - created
+
+jobs:
+    deploy_canary:
+        if: ${{ github.event.issue.pull_request && (github.event.comment.body == 'canary-publish' || github.event.comment.body == '/canary-publish')}}
+        env:
+            GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get PR branch name
+              id: get_branch
+              run: |
+                  PR=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }})
+                  echo "::set-output name=branch::$(echo $PR | jq -r '.head.ref')"
+            - uses: actions/github-script@v3
+              id: get-pr
+              with:
+                  script: |
+                      const request = {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number
+                      }
+                      core.info(`Getting PR #${request.pull_number} from ${request.owner}/${request.repo}`)
+                      try {
+                        const result = await github.pulls.get(request)
+                        return result.data
+                      } catch (err) {
+                        core.setFailed(`Request failed with error ${err}`)
+                      }
+            - name: Reaction
+              uses: actions/github-script@v3
+              with:
+                  script: |
+                      const prNumber = context.issue.number
+                      const {owner, repo} = context.repo
+                      core.info(`Reaction for comment on PR #${prNumber}`)
+                      try {
+                        const result = github.reactions.createForIssueComment({
+                          owner,
+                          repo,
+                          comment_id: ${{github.event.comment.id}},
+                          content: 'rocket'
+                        })
+                        return result.data
+                      } catch (Err) {
+                        core.setFailed(`Request failed with error ${err}`)
+                      }
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.get_branch.outputs.branch }}
+
+            - name: pnpm install
+              run: |
+                  pnpm install --no-frozen-lockfile
+
+            - name: deploy canary
+              uses: uses: NaverPayDev/@naverpay/changeset-actions/canary-publish@main
+              with:
+                  github_token: ${{ secrets.ACTION_TOKEN }}
+                  npm_tag: canary
+                  publish_script: pnpm release:canary
+                  packages_dir: packages

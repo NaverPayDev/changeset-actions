@@ -22,12 +22,12 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
     detectAdd:
-        runs-on: common-fe
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
-            - uses: common-fe/actions/changesets/detect-add@feature/27_publish
+            - uses: NaverPayDev/@naverpay/changeset-actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
                   npm_token: ${{ secrets.NPM_TOKEN }} # npm 배포시 필요한 publish token 을 넣어주세요 
@@ -37,6 +37,7 @@ jobs:
                   pr_title: 🚀 version changed packages # 버전업 pr 생성시 설정할 pr 타이틀 넣어주세요
                   commit_message: 📦 bump changed packages version # 버전업 pr 생성시 설정할 commit 메시지를 넣어주세요
                   create_github_release_tag: true # release tag 생성여부를 넣어주세요
+                  formatting_script: pnpm run markdownlint:fix # 생성되는 md 파일의 formatting이 필요하다면 추가해주세요
 ```
 
 ## 실행 결과
