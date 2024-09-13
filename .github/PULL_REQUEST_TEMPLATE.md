@@ -1,6 +1,6 @@
 ### 이슈 <!-- #뒤에 이슈번호 작성 -->
 
-- NaverPayDev/actions#
+- NaverPayDev/changeset-actions#
 
 ### 작업 유형
 
