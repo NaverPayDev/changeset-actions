@@ -36,7 +36,7 @@
         "typescript": "^5.2.2",
         "@types/node": "^20.14.9"
     },
-    "packageManager": "pnpm@8.14.3",
+    "packageManager": "pnpm@9.4.0",
     "dependencies": {
         "@actions/core": "^1.10.1",
         "@actions/github": "^6.0.0",
@@ -44,9 +44,5 @@
         "@vercel/ncc": "^0.38.1",
         "lefthook": "^1.6.10",
         "@actions/exec": "^1.1.1"
-    },
-    "engines": {
-        "node": "^18.12.0",
-        "pnpm": "^8.14.3"
     }
 }
