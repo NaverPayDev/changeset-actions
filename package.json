@@ -42,7 +42,8 @@
         "@actions/github": "^6.0.0",
         "@naverpay/commit-helper": "^1.0.0",
         "@vercel/ncc": "^0.38.1",
-        "lefthook": "^1.6.10"
+        "lefthook": "^1.6.10",
+        "@actions/exec": "^1.1.1"
     },
     "engines": {
         "node": "^18.12.0",

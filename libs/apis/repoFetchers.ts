@@ -21,7 +21,27 @@ const createRepoFetchers = (octokitRestCommonParams: OctokitRestCommonParamsType
         return repoInfo
     }
 
-    return {getRepoInfo}
+    const createRelease = async ({
+        name,
+        tagName,
+        body,
+        prerelease,
+    }: {
+        name: string
+        tagName: string
+        body: string
+        prerelease: boolean
+    }) => {
+        await octokit.rest.repos.createRelease({
+            name,
+            tag_name: tagName,
+            body,
+            prerelease,
+            ...octokitRestCommonParams,
+        })
+    }
+
+    return {getRepoInfo, createRelease}
 }
 
 export default createRepoFetchers

@@ -1,10 +1,9 @@
 import {getExecOutput} from '@actions/exec'
 import {getPackages, Package} from '@manypkg/get-packages'
 
-import {getOctokitRestCommonParams, pushTags} from '$actions/utils'
+import {getOctokitRestCommonParams, pushTags, uniqBy} from '$actions/utils'
 
 import {createReleaseTag} from './utils/git'
-import {uniqBy} from './utils/uniqBy'
 
 const cwd = process.cwd()
 

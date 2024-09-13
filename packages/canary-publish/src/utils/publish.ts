@@ -1,6 +1,6 @@
 import {ExecOutput} from '@actions/exec'
 
-import {uniqBy} from './uniqBy'
+import {uniqBy} from '$actions/utils'
 
 export function getPublishedPackageInfos({packagesDir, execOutput}: {execOutput: ExecOutput; packagesDir: string}) {
     const publishedPackages = []

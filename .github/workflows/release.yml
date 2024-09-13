@@ -23,7 +23,7 @@ jobs:
 
             - name: Create Release Pull Request
               id: changesets
-              uses: NaverPayDev/@naverpay/changeset-actions/detect-add@main
+              uses: NaverPayDev/changeset-actions/detect-add@main
               with:
                   github_token: ${{ secrets.ACTION_TOKEN }}
                   git_username: npay-fe-bot

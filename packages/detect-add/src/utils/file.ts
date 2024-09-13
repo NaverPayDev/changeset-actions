@@ -1,37 +1,10 @@
-import * as github from '@actions/github'
-
-import {uniqBy} from './uniqBy'
-
-export async function getAllChangedFiles({
-    owner,
-    repo,
-    octokit,
-    pullNumber,
-}: {
-    owner: string
-    repo: string
-    pullNumber: number
-    octokit: ReturnType<typeof github.getOctokit>
-}) {
-    const changedFiles = []
-
-    for await (const response of octokit.paginate.iterator(octokit.rest.pulls.listFiles, {
-        owner,
-        repo,
-        pull_number: pullNumber,
-        per_page: 100,
-    })) {
-        changedFiles.push(...response.data)
-    }
-
-    return changedFiles
-}
+import {getChangedAllFiles, uniqBy} from '$actions/utils'
 
 export async function getChangedPackages({
     packagesDir,
     allChangedFiles,
 }: {
-    allChangedFiles: Awaited<ReturnType<typeof getAllChangedFiles>>
+    allChangedFiles: Awaited<ReturnType<typeof getChangedAllFiles>>
     packagesDir: string[]
 }) {
     const changedPackages = allChangedFiles

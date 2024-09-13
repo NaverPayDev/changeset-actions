@@ -3,11 +3,11 @@ import {exec} from '@actions/exec'
 import * as github from '@actions/github'
 import {decode} from 'js-base64'
 
-import {commitAll, getOctokitRestCommonParams, push} from '$actions/utils'
+import {commitAll, getChangedAllFiles, getOctokitRestCommonParams, push} from '$actions/utils'
 
 import {CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM} from './constants'
 import {getChangedPackagesGithubComment, getChangesetEmptyGithubComment} from './utils/changeset'
-import {getAllChangedFiles, getChangedPackages} from './utils/file'
+import {getChangedPackages} from './utils/file'
 
 async function main() {
     const context = github.context
@@ -73,12 +73,7 @@ async function main() {
     }
 
     // 변경된 모든 파일을 가져온다.
-    const allChangedFiles = await getAllChangedFiles({
-        owner,
-        repo,
-        octokit,
-        pullNumber,
-    })
+    const allChangedFiles = await getChangedAllFiles({pullNumber})
 
     // formatting_script 가 존재하고 변경된 파일중에 .changeset/*.md 가 존재한다면
     const formattingScript = core.getInput('formatting_script')
