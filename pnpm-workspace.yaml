@@ -1,2 +1,4 @@
 packages:
-    - 'actions/*'
+    - 'canary-publish'
+    - 'detect-add'
+    - 'publish'

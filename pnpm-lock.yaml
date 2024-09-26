@@ -52,7 +52,7 @@ importers:
         specifier: ^5.2.2
         version: 5.6.2
 
-  actions/canary-publish:
+  canary-publish:
     dependencies:
       '@changesets/cli':
         specifier: ^2.20.0
@@ -80,7 +80,7 @@ importers:
         specifier: ^20.14.9
         version: 20.16.5
 
-  actions/detect-add:
+  detect-add:
     dependencies:
       '@vercel/ncc':
         specifier: ^0.38.1
@@ -96,7 +96,7 @@ importers:
         specifier: ^20.14.9
         version: 20.16.5
 
-  actions/publish:
+  publish:
     dependencies:
       '@changesets/read':
         specifier: ^0.6.0
