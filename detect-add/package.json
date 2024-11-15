@@ -13,7 +13,6 @@
     },
     "dependencies": {
         "@vercel/ncc": "^0.38.1",
-        "js-base64": "^3.7.5",
         "human-id": "^4.0.0"
     },
     "devDependencies": {
