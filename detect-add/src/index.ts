@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import * as github from '@actions/github'
-import {decode} from 'js-base64'
 
 import {commitAll, getChangedAllFiles, getOctokitRestCommonParams, push} from '$actions/utils'
 
@@ -64,9 +63,10 @@ async function main() {
      * 변경된 파일 이름을 가져오기위한 api
      */
 
-    const rawPackagesDir = core.getInput('packages_dir')
+    const packages_dir = core.getInput('packages_dir')
+    const excludes = core.getInput('excludes') ?? ''
 
-    if (typeof rawPackagesDir !== 'string') {
+    if (typeof packages_dir !== 'string') {
         throw new Error(
             `해당 action에 주입된 packages_dir parameter가 잘못되었습니다. (string, string1)의 형식으로 작성해주세요.`,
         )
@@ -102,13 +102,15 @@ async function main() {
 
     // 변경된 파일들중에 packagesDir 내부에 파일만 골라낸다. (이때 .md 는 무시한다)
     // TODO(new-jeans): 확장자를 외부에서 받아서 필터링 할 수 있도록
-    const changedPackageInfos = await getChangedPackages({
-        allChangedFiles,
-        packagesDir: rawPackagesDir.split(',').map((v) => v.trim()) as string[],
+    // 변경된 파일들중에 packagesDir 내부에 파일만 골라낸다. (이때 .md 는 무시한다)
+    const changedPackages = await getChangedPackages({
+        changedFiles: allChangedFiles,
+        packagesDir: packages_dir.split(',').map((v) => v.trim()) as string[],
+        excludes: excludes.split(',') as string[],
     })
 
     // 변경된 패키지가 없다면 Empty 메시지를 남긴다.
-    if (changedPackageInfos.length === 0) {
+    if (changedPackages.length === 0) {
         if (prevComment !== undefined) {
             await octokit.rest.issues.updateComment({
                 owner,
@@ -129,37 +131,9 @@ async function main() {
         return
     }
 
-    // 변경된 패키지들의 package.json 내부의 정의된 이름들을 가져온다.
-    const changedPackageNames = await Promise.all(
-        changedPackageInfos.map(async ({packageName, packageJsonPath}) => {
-            // 삭제된 패키지의 경우 package.json 의 name 을 가져올 수 없기 때문에 packageName(폴더명) 을 fallback 으로 사용한다.
-            if (packageJsonPath == null) {
-                return packageName
-            }
-
-            try {
-                const {data} = await octokit.rest.repos.getContent({
-                    owner,
-                    repo,
-                    path: packageJsonPath,
-                    ref: pull_request?.head?.ref || 'master',
-                })
-                if ('content' in data) {
-                    const {name} = JSON.parse(decode(data.content)) as {name: string}
-                    return name
-                } else {
-                    return packageName
-                }
-            } catch (e) {
-                core.info(`[ERROR] ${packageName}의 package.json의 name 필드를 찾을 수 없습니다.`)
-                return packageName
-            }
-        }),
-    )
-
     // 변경된 패키지들의 정보를 바탕으로 메시지를 생성한다.
     const comment = getChangedPackagesGithubComment({
-        changedPackageNames,
+        changedPackages,
         pullRequest: pull_request,
         skipLabel,
     })

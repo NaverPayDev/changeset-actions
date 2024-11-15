@@ -31,6 +31,7 @@ jobs:
                   skip_label: skip_detect_label # 해당 액션을 skip할 label의 이름을 적어주세요. (default: skip-detect-change) 
                   packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share) 
                   formatting_script: pnpm run markdownlint:fix # 생성되는 md 파일의 formatting이 필요하다면 추가해주세요
+                  excludes: ".turbo,.github" # 변경감지를 제외하고싶은 파일 또는 폴더 경로
 ```
 
 ## 실행 결과

@@ -5,8 +5,9 @@ import fs from 'fs-extra'
 import resolveFrom from 'resolve-from'
 
 import createFetchers from '$actions/apis'
+import {getChangedAllFiles} from '$actions/utils'
 
-import {getChangedPackages, protectUnchangedPackages} from './utils/file'
+import {getChangedPackages, protectUnchangedPackages, removeChangesetMdFiles} from './utils/file'
 import {setNpmRc} from './utils/npm'
 import {getPublishedPackageInfos} from './utils/publish'
 
@@ -30,11 +31,18 @@ async function main() {
             return
         }
 
+        const changedFiles = await getChangedAllFiles({
+            pullNumber: pullRequestInfo.number,
+        })
+
         // 변경된 패키지 파일을 가져온다
         const packagesDir = core.getInput('packages_dir')
+        const excludes = core.getInput('excludes') ?? ''
+
         const changedPackageInfos = await getChangedPackages({
-            pullNumber: pullRequestInfo.number,
             packagesDir: packagesDir.split(',') as string[],
+            excludes: excludes.split(',') as string[],
+            changedFiles,
         })
 
         if (changedPackageInfos.length === 0) {
@@ -42,8 +50,12 @@ async function main() {
             return
         }
 
-        // 변경사항외 다른 패키지들의 배포를 막습니다.
-        await protectUnchangedPackages(changedPackageInfos)
+        await Promise.all([
+            // 이번 변경건과 관련없는 모든 .changeset/*.md 파일을 제거한다.
+            removeChangesetMdFiles({changedFiles}),
+            // 변경사항외 다른 패키지들의 배포를 막습니다.
+            protectUnchangedPackages(changedPackageInfos),
+        ])
 
         // 패키지 변경 버전 반영
         await exec('node', [resolveFrom(cwd, '@changesets/cli/bin.js'), 'version'], {

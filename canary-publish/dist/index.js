@@ -53253,12 +53253,14 @@ const read_1 = __importDefault(__nccwpck_require__(1746));
 const fs_extra_1 = __importDefault(__nccwpck_require__(77));
 const resolve_from_1 = __importDefault(__nccwpck_require__(1345));
 const apis_1 = __importDefault(__nccwpck_require__(6500));
+const utils_1 = __nccwpck_require__(3927);
 const file_1 = __nccwpck_require__(398);
 const npm_1 = __nccwpck_require__(6824);
 const publish_1 = __nccwpck_require__(9459);
 const cwd = process.cwd();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         // npmrc 설정
         yield (0, npm_1.setNpmRc)();
         const { pullFetchers, issueFetchers } = (0, apis_1.default)();
@@ -53271,18 +53273,27 @@ function main() {
                 yield issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요');
                 return;
             }
+            const changedFiles = yield (0, utils_1.getChangedAllFiles)({
+                pullNumber: pullRequestInfo.number,
+            });
             // 변경된 패키지 파일을 가져온다
             const packagesDir = core.getInput('packages_dir');
+            const excludes = (_a = core.getInput('excludes')) !== null && _a !== void 0 ? _a : '';
             const changedPackageInfos = yield (0, file_1.getChangedPackages)({
-                pullNumber: pullRequestInfo.number,
                 packagesDir: packagesDir.split(','),
+                excludes: excludes.split(','),
+                changedFiles,
             });
             if (changedPackageInfos.length === 0) {
                 core.info('변경된 패키지가 없습니다.');
                 return;
             }
-            // 변경사항외 다른 패키지들의 배포를 막습니다.
-            yield (0, file_1.protectUnchangedPackages)(changedPackageInfos);
+            yield Promise.all([
+                // 이번 변경건과 관련없는 모든 .changeset/*.md 파일을 제거한다.
+                (0, file_1.removeChangesetMdFiles)({ changedFiles }),
+                // 변경사항외 다른 패키지들의 배포를 막습니다.
+                (0, file_1.protectUnchangedPackages)(changedPackageInfos),
+            ]);
             // 패키지 변경 버전 반영
             yield (0, exec_1.exec)('node', [(0, resolve_from_1.default)(cwd, '@changesets/cli/bin.js'), 'version'], {
                 cwd,
@@ -53383,26 +53394,31 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedPackages = getChangedPackages;
 exports.getAllPackageJSON = getAllPackageJSON;
 exports.protectUnchangedPackages = protectUnchangedPackages;
+exports.removeChangesetMdFiles = removeChangesetMdFiles;
 const core = __importStar(__nccwpck_require__(6108));
 const fast_glob_1 = __importDefault(__nccwpck_require__(6014));
 const fs_extra_1 = __importDefault(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedPackages(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ pullNumber, packagesDir }) {
-        const changedFiles = yield (0, utils_1.getChangedAllFiles)({
-            pullNumber,
-        });
+    return __awaiter(this, arguments, void 0, function* ({ changedFiles, packagesDir, excludes, }) {
+        const isIncludedRoot = packagesDir.includes('.') === true;
+        const targetDirectories = packagesDir.filter((packagename) => packagename !== '.');
         const changedPackages = changedFiles.reduce((acc, { filename }) => {
-            const isTargetDirectories = packagesDir.some((packageDir) => filename.includes(`${packageDir}/`));
-            const isMarkdownFile = filename.endsWith('.md');
-            if (isTargetDirectories && !isMarkdownFile) {
-                const [packageRoot, packageName] = filename.split('/');
-                const packageJsonPath = [packageRoot, packageName, 'package.json'].join('/');
-                acc.push(packageJsonPath);
+            const 패키지대상인가 = isIncludedRoot || targetDirectories.some((packageDir) => filename.includes(`${packageDir}/`));
+            const 마크다운파일인가 = filename.endsWith('.md');
+            const 제외대상인가 = excludes.some((exclude) => {
+                return filename === exclude || filename.startsWith(`${exclude}`);
+            });
+            if (패키지대상인가 && !마크다운파일인가 && !제외대상인가) {
+                const packageJsonPath = isIncludedRoot ? 'package.json' : (0, utils_1.findNearestPackageJson)(filename);
+                if (packageJsonPath != null) {
+                    acc.add(packageJsonPath);
+                }
             }
             return acc;
-        }, []);
-        return [...new Set(changedPackages)];
+        }, new Set());
+        console.log('필터링된 packages', Array.from(changedPackages)); // eslint-disable-line
+        return Array.from(changedPackages);
     });
 }
 function getAllPackageJSON() {
@@ -53424,6 +53440,17 @@ function protectUnchangedPackages(changedPackages) {
                 fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             }
         }
+    });
+}
+function removeChangesetMdFiles(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ changedFiles, }) {
+        const markdownPaths = yield (0, fast_glob_1.default)('.changeset/*.md');
+        return Promise.all(markdownPaths.map((markdownPath) => __awaiter(this, void 0, void 0, function* () {
+            if (changedFiles.find(({ filename }) => filename === markdownPath) == null) {
+                console.log(`PR과 관련없는 ${markdownPath} 제거`); // eslint-disable-line
+                yield fs_extra_1.default.remove(markdownPath);
+            }
+        })));
     });
 }
 
@@ -53818,10 +53845,16 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedAllFiles = getChangedAllFiles;
+exports.findNearestPackageJson = findNearestPackageJson;
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(6108));
 const github = __importStar(__nccwpck_require__(1645));
+const fs_extra_1 = __importDefault(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedAllFiles(_a) {
     return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
@@ -53852,6 +53885,17 @@ function getChangedAllFiles(_a) {
         }
         return changedFiles;
     });
+}
+function findNearestPackageJson(filePath) {
+    let currentDir = path_1.default.dirname(filePath);
+    while (currentDir !== path_1.default.parse(currentDir).root) {
+        const packageJsonPath = path_1.default.join(currentDir, 'package.json');
+        if (fs_extra_1.default.existsSync(packageJsonPath)) {
+            return packageJsonPath;
+        }
+        currentDir = path_1.default.dirname(currentDir);
+    }
+    return undefined;
 }
 
 

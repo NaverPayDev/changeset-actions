@@ -22,3 +22,7 @@ inputs:
     formatting_script:
         description: ".changeset/*.md 파일 포매팅이 필요하다면 script 명령어를 추가해주세요"
         required: false
+    excludes: 
+        description: "제외할 경로"
+        required: false
+        default: ".github,.changeset"

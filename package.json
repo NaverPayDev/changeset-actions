@@ -34,7 +34,8 @@
         "lint-staged": "^15.0.1",
         "turbo": "^1.10.16",
         "typescript": "^5.2.2",
-        "@types/node": "^20.14.9"
+        "@types/node": "^20.14.9",
+        "@types/fs-extra": "^8.0.0"
     },
     "packageManager": "pnpm@9.4.0",
     "dependencies": {
@@ -43,6 +44,7 @@
         "@naverpay/commit-helper": "^1.0.0",
         "@vercel/ncc": "^0.38.1",
         "lefthook": "^1.6.10",
+        "fs-extra": "^8.1.0",
         "@actions/exec": "^1.1.1"
     }
 }

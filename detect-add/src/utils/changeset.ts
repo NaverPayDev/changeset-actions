@@ -52,11 +52,11 @@ export function getAddChangesetUrl(
 }
 
 export function getChangedPackagesGithubComment({
-    changedPackageNames,
+    changedPackages,
     pullRequest,
     skipLabel,
 }: {
-    changedPackageNames: string[]
+    changedPackages: string[]
     pullRequest: {
         [key: string]: any // eslint-disable-line @typescript-eslint/no-explicit-any
         number: number
@@ -68,17 +68,17 @@ export function getChangedPackagesGithubComment({
     return [
         `> ${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}`,
         '',
-        `\`${changedPackageNames.join('`, `')}\` 패키지${
-            changedPackageNames.length > 1 ? '들' : ''
+        `\`${changedPackages.join('`, `')}\` 패키지${
+            changedPackages.length > 1 ? '들' : ''
         }에 변경사항이 감지되었습니다.`,
         '',
         `${skipLabel != null ? `만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.` : ''}`,
         '',
         '.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요',
         '',
-        `X.0.0 [major bump](${getAddChangesetUrl(changedPackageNames, pullRequest, 'major')})`,
-        `0.X.0 [minor bump](${getAddChangesetUrl(changedPackageNames, pullRequest, 'minor')})`,
-        `0.0.X [patch bump](${getAddChangesetUrl(changedPackageNames, pullRequest, 'patch')})`,
+        `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
+        `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
+        `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
     ].join('\n')
 }
 
