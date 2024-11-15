@@ -4,11 +4,13 @@ import fs from 'fs-extra'
 
 import {getChangedAllFiles} from '$actions/utils'
 
-export async function getChangedPackages({pullNumber, packagesDir}: {pullNumber: number; packagesDir: string[]}) {
-    const changedFiles = await getChangedAllFiles({
-        pullNumber,
-    })
-
+export async function getChangedPackages({
+    changedFiles,
+    packagesDir,
+}: {
+    changedFiles: Awaited<ReturnType<typeof getChangedAllFiles>>
+    packagesDir: string[]
+}) {
     const changedPackages = changedFiles.reduce((acc, {filename}) => {
         const isTargetDirectories = packagesDir.some((packageDir) => filename.includes(`${packageDir}/`))
         const isMarkdownFile = filename.endsWith('.md')
@@ -47,4 +49,22 @@ export async function protectUnchangedPackages(changedPackages: string[]) {
             fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8')
         }
     }
+}
+
+export async function removeChangesetMdFiles({
+    changedFiles,
+}: {
+    changedFiles: Awaited<ReturnType<typeof getChangedAllFiles>>
+}) {
+    const markdownPaths = await fg('.changeset/*.md')
+
+    return Promise.all(
+        markdownPaths.map(async (markdownPath) => {
+            if (changedFiles.find(({filename}) => filename === markdownPath) == null) {
+                console.log(`PR과 관련없는 ${markdownPath} 제거`) // eslint-disable-line
+
+                await fs.remove(markdownPath)
+            }
+        }),
+    )
 }
