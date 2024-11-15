@@ -1,5 +1,8 @@
+import path from 'path'
+
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import fs from 'fs-extra'
 
 import {getOctokitRestCommonParams} from '$actions/utils'
 
@@ -20,4 +23,20 @@ export async function getChangedAllFiles({pullNumber}: {pullNumber: number}) {
     }
 
     return changedFiles
+}
+
+export function findNearestPackageJson(filePath: string) {
+    let currentDir = path.dirname(filePath)
+
+    while (currentDir !== path.parse(currentDir).root) {
+        const packageJsonPath = path.join(currentDir, 'package.json')
+
+        if (fs.existsSync(packageJsonPath)) {
+            return packageJsonPath
+        }
+
+        currentDir = path.dirname(currentDir)
+    }
+
+    return undefined
 }

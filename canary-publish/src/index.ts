@@ -37,8 +37,11 @@ async function main() {
 
         // 변경된 패키지 파일을 가져온다
         const packagesDir = core.getInput('packages_dir')
+        const excludes = core.getInput('excludes') ?? ''
+
         const changedPackageInfos = await getChangedPackages({
             packagesDir: packagesDir.split(',') as string[],
+            excludes: excludes.split(',') as string[],
             changedFiles,
         })
 
