@@ -45,7 +45,8 @@ jobs:
                   npm_tag: canary # npm 배포 시 달아줄 태그는 무엇으로 할지적어주세요
                   npm_token: ${{ secrets.NPM_TOKEN }} # npm 배포시 필요한 publish token 을 넣어주세요 
                   publish_script: pnpm run deploy:canary # canary 배포 실행 script 를 넣어주세요
-                  packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share)             
+                  packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share)       
+                  excludes: ".turbo,.github" # 변경감지를 제외하고싶은 파일 또는 폴더 경로      
 ```
 
 ## 실행 결과
