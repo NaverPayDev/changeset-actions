@@ -34036,7 +34036,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedPackages = getChangedPackages;
-const fs_extra_1 = __nccwpck_require__(77);
+const fs = __nccwpck_require__(77);
 const utils_1 = __nccwpck_require__(3927);
 function getChangedPackages(_a) {
     return __awaiter(this, arguments, void 0, function* ({ packagesDir, changedFiles, excludes, }) {
@@ -34055,7 +34055,7 @@ function getChangedPackages(_a) {
             if (패키지대상인가 && !마크다운파일인가 && !제외대상인가) {
                 const packageJsonPath = isIncludedRoot ? 'package.json' : (0, utils_1.findNearestPackageJson)(filename);
                 if (packageJsonPath != null) {
-                    const packageJsonData = fs_extra_1.default.readFileSync(packageJsonPath, 'utf-8');
+                    const packageJsonData = fs.readFileSync(packageJsonPath, 'utf-8');
                     const packageJson = JSON.parse(packageJsonData);
                     acc.add(packageJson.name);
                 }

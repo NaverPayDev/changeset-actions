@@ -53250,7 +53250,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
 const read_1 = __importDefault(__nccwpck_require__(1746));
-const fs_extra_1 = __importDefault(__nccwpck_require__(77));
+const fs = __importStar(__nccwpck_require__(77));
 const resolve_from_1 = __importDefault(__nccwpck_require__(1345));
 const apis_1 = __importDefault(__nccwpck_require__(6500));
 const utils_1 = __nccwpck_require__(3927);
@@ -53301,7 +53301,7 @@ function main() {
             // publish 스크립트에 태그를 붙여줍니다.
             const npmTag = core.getInput('npm_tag');
             const rootPackageJsonPath = `package.json`;
-            const rootPackageJson = JSON.parse(fs_extra_1.default.readFileSync(rootPackageJsonPath, 'utf8'));
+            const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath, 'utf8'));
             for (const [key, script] of Object.entries(rootPackageJson.scripts)) {
                 if (script.includes('changeset publish')) {
                     // 카나리배포는 태그를 남기지 않습니다
@@ -53314,14 +53314,14 @@ function main() {
                     }
                 }
             }
-            fs_extra_1.default.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
+            fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
             // 변경된 패키지들의 버전을 강제로 치환합니다
             changedPackageInfos.forEach((packageJsonPath) => {
-                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
+                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                 const newVersion = `${packageJson.version}-${npmTag}-${pullRequestInfo.head.sha.slice(0, 7)}`;
                 core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
                 packageJson.version = newVersion;
-                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+                fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             });
             // 변경된 버전으로 카나리 배포
             const publishScript = core.getInput('publish_script');
@@ -53397,7 +53397,7 @@ exports.protectUnchangedPackages = protectUnchangedPackages;
 exports.removeChangesetMdFiles = removeChangesetMdFiles;
 const core = __importStar(__nccwpck_require__(6108));
 const fast_glob_1 = __importDefault(__nccwpck_require__(6014));
-const fs_extra_1 = __importDefault(__nccwpck_require__(77));
+const fs = __importStar(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedPackages(_a) {
     return __awaiter(this, arguments, void 0, function* ({ changedFiles, packagesDir, excludes, }) {
@@ -53434,10 +53434,10 @@ function protectUnchangedPackages(changedPackages) {
         const allPackageJSON = yield getAllPackageJSON();
         for (const packageJsonPath of allPackageJSON) {
             if (!changedPackages.includes(packageJsonPath)) {
-                const packageJson = JSON.parse(fs_extra_1.default.readFileSync(packageJsonPath, 'utf8'));
+                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                 core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`);
                 packageJson.private = true;
-                fs_extra_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+                fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             }
         }
     });
@@ -53448,7 +53448,7 @@ function removeChangesetMdFiles(_a) {
         return Promise.all(markdownPaths.map((markdownPath) => __awaiter(this, void 0, void 0, function* () {
             if (changedFiles.find(({ filename }) => filename === markdownPath) == null) {
                 console.log(`PR과 관련없는 ${markdownPath} 제거`); // eslint-disable-line
-                yield fs_extra_1.default.remove(markdownPath);
+                yield fs.remove(markdownPath);
             }
         })));
     });
@@ -53494,20 +53494,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setNpmRc = setNpmRc;
 const core = __importStar(__nccwpck_require__(6108));
-const fs_extra_1 = __importDefault(__nccwpck_require__(77));
+const fs = __importStar(__nccwpck_require__(77));
 function setNpmRc() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('No changesets found, attempting to publish any unpublished packages to npm');
         const userNpmrcPath = `${process.env.HOME}/.npmrc`;
-        if (fs_extra_1.default.existsSync(userNpmrcPath)) {
+        if (fs.existsSync(userNpmrcPath)) {
             core.info('Found existing user .npmrc file');
-            const userNpmrcContent = yield fs_extra_1.default.readFile(userNpmrcPath, 'utf8');
+            const userNpmrcContent = yield fs.readFile(userNpmrcPath, 'utf8');
             const authLine = userNpmrcContent.split('\n').find((line) => {
                 // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
                 return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
@@ -53517,12 +53514,12 @@ function setNpmRc() {
             }
             else {
                 core.info("Didn't find existing auth token for the npm registry in the user .npmrc file, creating one");
-                fs_extra_1.default.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
+                fs.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
             }
         }
         else {
             core.info('No user .npmrc file found, creating one');
-            fs_extra_1.default.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
+            fs.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`);
         }
     });
 }
