@@ -1,4 +1,4 @@
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 
 import {findNearestPackageJson, getChangedAllFiles} from '$actions/utils'
 

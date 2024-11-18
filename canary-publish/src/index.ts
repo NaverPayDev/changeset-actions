@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {exec, getExecOutput} from '@actions/exec'
 import readChangesets from '@changesets/read'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 import resolveFrom from 'resolve-from'
 
 import createFetchers from '$actions/apis'

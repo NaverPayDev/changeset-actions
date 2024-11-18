@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 
 export async function setNpmRc() {
     core.info('No changesets found, attempting to publish any unpublished packages to npm')
