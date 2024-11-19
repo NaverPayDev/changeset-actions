@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 
 import {getOctokitRestCommonParams} from '$actions/utils'
 

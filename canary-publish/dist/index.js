@@ -53842,16 +53842,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedAllFiles = getChangedAllFiles;
 exports.findNearestPackageJson = findNearestPackageJson;
 const path = __importStar(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(6108));
 const github = __importStar(__nccwpck_require__(1645));
-const fs_extra_1 = __importDefault(__nccwpck_require__(77));
+const fs = __importStar(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedAllFiles(_a) {
     return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
@@ -53887,7 +53884,7 @@ function findNearestPackageJson(filePath) {
     let currentDir = path.dirname(filePath);
     while (currentDir !== path.parse(currentDir).root) {
         const packageJsonPath = path.join(currentDir, 'package.json');
-        if (fs_extra_1.default.existsSync(packageJsonPath)) {
+        if (fs.existsSync(packageJsonPath)) {
             return packageJsonPath;
         }
         currentDir = path.dirname(currentDir);

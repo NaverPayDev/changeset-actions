@@ -1,8 +1,8 @@
-import path from 'path'
+import * as path from 'path'
 
 import * as github from '@actions/github'
 import {Package} from '@manypkg/get-packages'
-import fs from 'fs-extra'
+import * as fs from 'fs-extra'
 
 import createFetchers from '$actions/apis'
 

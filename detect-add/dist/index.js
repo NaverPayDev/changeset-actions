@@ -34097,7 +34097,7 @@ exports.findNearestPackageJson = findNearestPackageJson;
 const path = __nccwpck_require__(1017);
 const core = __nccwpck_require__(6108);
 const github = __nccwpck_require__(1645);
-const fs_extra_1 = __nccwpck_require__(77);
+const fs = __nccwpck_require__(77);
 const utils_1 = __nccwpck_require__(3927);
 function getChangedAllFiles(_a) {
     return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
@@ -34133,7 +34133,7 @@ function findNearestPackageJson(filePath) {
     let currentDir = path.dirname(filePath);
     while (currentDir !== path.parse(currentDir).root) {
         const packageJsonPath = path.join(currentDir, 'package.json');
-        if (fs_extra_1.default.existsSync(packageJsonPath)) {
+        if (fs.existsSync(packageJsonPath)) {
             return packageJsonPath;
         }
         currentDir = path.dirname(currentDir);
