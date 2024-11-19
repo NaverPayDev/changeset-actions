@@ -63773,16 +63773,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedAllFiles = getChangedAllFiles;
 exports.findNearestPackageJson = findNearestPackageJson;
 const path = __importStar(__nccwpck_require__(71017));
 const core = __importStar(__nccwpck_require__(6108));
 const github = __importStar(__nccwpck_require__(31645));
-const fs_extra_1 = __importDefault(__nccwpck_require__(20077));
+const fs = __importStar(__nccwpck_require__(20077));
 const utils_1 = __nccwpck_require__(53927);
 function getChangedAllFiles(_a) {
     return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
@@ -63818,7 +63815,7 @@ function findNearestPackageJson(filePath) {
     let currentDir = path.dirname(filePath);
     while (currentDir !== path.parse(currentDir).root) {
         const packageJsonPath = path.join(currentDir, 'package.json');
-        if (fs_extra_1.default.existsSync(packageJsonPath)) {
+        if (fs.existsSync(packageJsonPath)) {
             return packageJsonPath;
         }
         currentDir = path.dirname(currentDir);
@@ -64307,14 +64304,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createReleaseTag = void 0;
-const path_1 = __importDefault(__nccwpck_require__(71017));
+const path = __importStar(__nccwpck_require__(71017));
 const github = __importStar(__nccwpck_require__(31645));
-const fs_extra_1 = __importDefault(__nccwpck_require__(20077));
+const fs = __importStar(__nccwpck_require__(20077));
 const apis_1 = __importDefault(__nccwpck_require__(6500));
 const file_1 = __nccwpck_require__(80398);
 const createReleaseTag = (_a) => __awaiter(void 0, [_a], void 0, function* ({ pkg, tagName }) {
     try {
-        const changelog = yield fs_extra_1.default.readFile(path_1.default.join(pkg.dir, 'CHANGELOG.md'), 'utf8');
+        const changelog = yield fs.readFile(path.join(pkg.dir, 'CHANGELOG.md'), 'utf8');
         const changelogEntry = (0, file_1.getChangelogEntry)(changelog, pkg.packageJson.version);
         if (!changelogEntry) {
             throw new Error(`${pkg.packageJson.name}@${pkg.packageJson.version}의 변경항목을 찾을 수 없습니다.`);
@@ -64370,21 +64367,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setNpmRc = setNpmRc;
 const core = __importStar(__nccwpck_require__(6108));
-const fs_extra_1 = __importDefault(__nccwpck_require__(20077));
+const fs = __importStar(__nccwpck_require__(20077));
 function setNpmRc() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('No changesets found, attempting to publish any unpublished packages to npm');
         const npmToken = core.getInput('npm_token');
         const userNpmrcPath = `${process.env.HOME}/.npmrc`;
-        if (fs_extra_1.default.existsSync(userNpmrcPath)) {
+        if (fs.existsSync(userNpmrcPath)) {
             core.info('Found existing user .npmrc file');
-            const userNpmrcContent = yield fs_extra_1.default.readFile(userNpmrcPath, 'utf8');
+            const userNpmrcContent = yield fs.readFile(userNpmrcPath, 'utf8');
             const authLine = userNpmrcContent.split('\n').find((line) => {
                 // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
                 return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
@@ -64394,12 +64388,12 @@ function setNpmRc() {
             }
             else {
                 core.info("Didn't find existing auth token for the npm registry in the user .npmrc file, creating one");
-                fs_extra_1.default.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${npmToken}\n`);
+                fs.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${npmToken}\n`);
             }
         }
         else {
             core.info('No user .npmrc file found, creating one');
-            fs_extra_1.default.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${npmToken}\n`);
+            fs.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${npmToken}\n`);
         }
     });
 }
@@ -64496,11 +64490,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runVersion = runVersion;
-const path_1 = __importDefault(__nccwpck_require__(71017));
+const path = __importStar(__nccwpck_require__(71017));
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(39629);
 const github = __importStar(__nccwpck_require__(31645));
-const fs_extra_1 = __importDefault(__nccwpck_require__(20077));
+const fs = __importStar(__nccwpck_require__(20077));
 const resolve_from_1 = __importDefault(__nccwpck_require__(41345));
 const utils_1 = __nccwpck_require__(53927);
 const file_1 = __nccwpck_require__(80398);
@@ -64523,7 +64517,7 @@ function runVersion(_a) {
         // 변경패키지를 기준으로 CHANGELOG 컨텐츠 생성
         const changedPackages = yield (0, file_1.getChangedPackages)(cwd, versions);
         const changedPackagesInfoPromises = yield Promise.all(changedPackages.map((pkg) => __awaiter(this, void 0, void 0, function* () {
-            const changelogContents = yield fs_extra_1.default.readFile(path_1.default.join(pkg.dir, 'CHANGELOG.md'), 'utf8');
+            const changelogContents = yield fs.readFile(path.join(pkg.dir, 'CHANGELOG.md'), 'utf8');
             const entry = (0, file_1.getChangelogEntry)(changelogContents, pkg.packageJson.version);
             return {
                 highestLevel: entry.highestLevel,
