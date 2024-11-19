@@ -53848,7 +53848,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedAllFiles = getChangedAllFiles;
 exports.findNearestPackageJson = findNearestPackageJson;
-const path_1 = __importDefault(__nccwpck_require__(1017));
+const path = __importStar(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(6108));
 const github = __importStar(__nccwpck_require__(1645));
 const fs_extra_1 = __importDefault(__nccwpck_require__(77));
@@ -53884,13 +53884,13 @@ function getChangedAllFiles(_a) {
     });
 }
 function findNearestPackageJson(filePath) {
-    let currentDir = path_1.default.dirname(filePath);
-    while (currentDir !== path_1.default.parse(currentDir).root) {
-        const packageJsonPath = path_1.default.join(currentDir, 'package.json');
+    let currentDir = path.dirname(filePath);
+    while (currentDir !== path.parse(currentDir).root) {
+        const packageJsonPath = path.join(currentDir, 'package.json');
         if (fs_extra_1.default.existsSync(packageJsonPath)) {
             return packageJsonPath;
         }
-        currentDir = path_1.default.dirname(currentDir);
+        currentDir = path.dirname(currentDir);
     }
     return undefined;
 }
