@@ -15,10 +15,9 @@ export function getNewChangesetTemplate(
         ...changedPackageNames.map((x) => `"${x}": ${versionType}`),
         '---',
         '',
+        `${title}`,
         '',
-        '<!-- 변경된 사항을 입력해주세요. (이 줄을 지우고 하단에 명확하게 작성해주세요.) -->',
-        '',
-        `[${title}](${prUrl})`,
+        `PR: [${title}](${prUrl})`,
     ].join('\n')
 
     return encodeURIComponent(contents)
