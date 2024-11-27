@@ -33802,7 +33802,7 @@ function wrappy (fn, cb) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = void 0;
-exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = 'changeset-detect-add-actions';
+exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = 'naverpay-changeset-detect-add-actions';
 
 
 /***/ }),
@@ -33822,6 +33822,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+/* eslint-disable @typescript-eslint/naming-convention */
 const core = __nccwpck_require__(6108);
 const exec_1 = __nccwpck_require__(9629);
 const github = __nccwpck_require__(1645);
@@ -33831,7 +33832,7 @@ const changeset_1 = __nccwpck_require__(6621);
 const file_1 = __nccwpck_require__(398);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         const context = github.context;
         const { pull_request } = context.payload;
         if (!pull_request) {
@@ -33841,36 +33842,51 @@ function main() {
         const { number: pullNumber } = pull_request;
         const githubToken = core.getInput('github_token');
         const octokit = github.getOctokit(githubToken);
+        const language = core.getInput('language') || 'en';
+        const isKoreanLanguage = language === 'kr';
+        if (!['en', 'kr'].includes(language)) {
+            throw new Error(`An unsupported language value has been provided. Please use either \`en\` or \`kr\`. (Current value: ${language})`);
+        }
+        // eslint-disable-next-line no-console
+        console.log(pull_request);
+        const commonParams = { owner, repo, issue_number: pullNumber };
         /**
          * 변경된 파일 이름을 가져오기위한 api
          * TODO: lib/apis/issueFetch 로 이동
          */
-        const { data: comments } = yield octokit.rest.issues.listComments({ owner, repo, issue_number: pullNumber });
+        const { data: comments } = yield octokit.rest.issues.listComments(commonParams);
         const prevComment = comments.find((comment) => (comment === null || comment === void 0 ? void 0 : comment.body) && comment.body.includes(constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM));
         // skipLabel 룰에 따라 스킵처리한다.
         const skipLabel = core.getInput('skip_label');
         const isSkipByLabel = ((pull_request === null || pull_request === void 0 ? void 0 : pull_request.labels) || []).some(({ name }) => name === skipLabel);
         if (isSkipByLabel) {
-            core.info(`skip_label에 해당하는 label이 해당 PR에 추가되어 있어, 해당 PR에서는 ci를 스킵합니다. (해당 라벨 : ${skipLabel})`);
+            core.info(isKoreanLanguage
+                ? `skip_label에 해당하는 label이 해당 PR에 추가되어 있어, 해당 PR에서는 ci를 스킵합니다. (해당 라벨 : ${skipLabel})`
+                : `The label corresponding to \`skip_label\` has been added to this PR, so the CI will be skipped for this PR. (Label: ${skipLabel})`);
             if (prevComment) {
                 yield octokit.rest.issues.deleteComment({ owner, repo, comment_id: prevComment.id }).catch(() => { });
             }
             return;
         }
         // skipBranch 룰에 따라 스킵처리한다. (정의된 skip branch 거나 changeset-release 를 포함한다면)
-        const skipBranches = typeof core.getInput('skip_branches') === 'string' ? core.getInput('skip_branches').split(',') : [];
+        const skipBranchesInput = core.getInput('skip_branches');
+        const skipBranches = typeof skipBranchesInput === 'string' ? skipBranchesInput.split(',') : [];
         const isSkippedBaseBranch = skipBranches.includes(pull_request.base.ref) && (((_a = pull_request === null || pull_request === void 0 ? void 0 : pull_request.head) === null || _a === void 0 ? void 0 : _a.ref) || '').startsWith('changeset-release/');
         if (isSkippedBaseBranch) {
-            core.info(`base 브랜치가 ${pull_request.base.ref} 이거나, head 브랜치가 ${(_b = pull_request === null || pull_request === void 0 ? void 0 : pull_request.head) === null || _b === void 0 ? void 0 : _b.ref} 여서 detectAdd를 스킵합니다.`);
+            core.info(isKoreanLanguage
+                ? `base 브랜치가 ${pull_request.base.ref} 이거나, head 브랜치가 ${(_b = pull_request === null || pull_request === void 0 ? void 0 : pull_request.head) === null || _b === void 0 ? void 0 : _b.ref} 여서 detectAdd를 스킵합니다.`
+                : `The base branch is ${pull_request.base.ref}, or the head branch is ${(_c = pull_request === null || pull_request === void 0 ? void 0 : pull_request.head) === null || _c === void 0 ? void 0 : _c.ref}, so detectAdd is skipped.`);
             return;
         }
         /**
          * 변경된 파일 이름을 가져오기위한 api
          */
         const packages_dir = core.getInput('packages_dir');
-        const excludes = (_c = core.getInput('excludes')) !== null && _c !== void 0 ? _c : '';
+        const excludes = (_d = core.getInput('excludes')) !== null && _d !== void 0 ? _d : '';
         if (typeof packages_dir !== 'string') {
-            throw new Error(`해당 action에 주입된 packages_dir parameter가 잘못되었습니다. (string, string1)의 형식으로 작성해주세요.`);
+            throw new Error(isKoreanLanguage
+                ? `해당 action에 주입된 packages_dir parameter가 잘못되었습니다. (string, string1)의 형식으로 작성해주세요.`
+                : `The packages_dir parameter injected into this action is incorrect. Please format it as (string, string1).`);
         }
         // 변경된 모든 파일을 가져온다.
         const allChangedFiles = yield (0, utils_1.getChangedAllFiles)({ pullNumber });
@@ -33905,53 +33921,37 @@ function main() {
         });
         // 변경된 패키지가 없다면 Empty 메시지를 남긴다.
         if (changedPackages.length === 0) {
+            const emptyCommentContent = (0, changeset_1.getChangesetEmptyGithubComment)({ isKoreanLanguage });
+            const emptyComment = Object.assign(Object.assign({}, commonParams), { body: emptyCommentContent });
             if (prevComment !== undefined) {
-                yield octokit.rest.issues.updateComment({
-                    owner,
-                    repo,
-                    issue_number: pullNumber,
-                    body: (0, changeset_1.getChangesetEmptyGithubComment)(),
-                    comment_id: prevComment.id,
-                });
+                yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, emptyComment), { comment_id: prevComment.id }));
             }
             else {
-                yield octokit.rest.issues.createComment({
-                    owner,
-                    repo,
-                    issue_number: pullNumber,
-                    body: (0, changeset_1.getChangesetEmptyGithubComment)(),
-                });
+                yield octokit.rest.issues.createComment(Object.assign({}, emptyComment));
             }
             return;
         }
         // 변경된 패키지들의 정보를 바탕으로 메시지를 생성한다.
-        const comment = (0, changeset_1.getChangedPackagesGithubComment)({
+        const commentContent = (0, changeset_1.getChangedPackagesGithubComment)({
             changedPackages,
             pullRequest: pull_request,
+            isKoreanLanguage,
             skipLabel,
         });
+        const comment = Object.assign(Object.assign({}, commonParams), { body: commentContent });
         if (prevComment !== undefined) {
-            yield octokit.rest.issues.updateComment({
-                owner,
-                repo,
-                issue_number: pullNumber,
-                body: comment,
-                comment_id: prevComment.id,
-            });
+            yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, comment), { comment_id: prevComment.id }));
         }
         else {
-            yield octokit.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pullNumber,
-                body: comment,
-            });
+            yield octokit.rest.issues.createComment(comment);
         }
         // detect add 정보가 없다면 action 을 실패처리하고 가이드 메시지를 보여준다.
         if (!allChangedFiles.some(({ filename }) => filename.includes('.changeset'))) {
-            core.setFailed(`comment의 지침에 따라, .changeset 파일을 추가해주세요. ${skipLabel
-                ? `만약, 버전변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`
-                : '만약, 버전변경이 필요 없다면 해당 ci는 무시해주세요.'}`);
+            if (isKoreanLanguage) {
+                core.setFailed(`comment의 지침에 따라, .changeset 파일을 추가해주세요. 만약, 버전변경이 필요 없다면 ${skipLabel ? `${skipLabel}을 label에 추가해주세요.` : '해당 ci는 무시해주세요.'}`);
+                return;
+            }
+            core.setFailed(`Please add a .changeset file according to the comment guidelines. If no version change is required, ${skipLabel ? `please add ${skipLabel} to the label.` : 'please ignore this CI.'}`);
         }
     });
 }
@@ -33985,34 +33985,77 @@ function getNewChangesetTemplate(changedPackageNames, title, prUrl, versionType)
     return encodeURIComponent(contents);
 }
 function getAddChangesetUrl(changedPackageNames, pull_request, versionType) {
-    const fileName = (0, human_id_1.humanId)({
-        separator: '-',
-        capitalize: false,
-    });
+    const fileName = (0, human_id_1.humanId)({ separator: '-', capitalize: false });
     const commitMessage = `[${versionType}] ${fileName}`;
-    return `${pull_request.head.repo.html_url}/new/${pull_request.head.ref}?filename=.changeset/${fileName}.md&value=${getNewChangesetTemplate(changedPackageNames, pull_request.title, pull_request.html_url || '', versionType)}&message=${encodeURIComponent(commitMessage)}`;
+    const template = getNewChangesetTemplate(changedPackageNames, pull_request.title, pull_request.html_url || '', versionType);
+    const origin = pull_request.head.repo.html_url;
+    const pathname = `/new/${pull_request.head.ref}`;
+    const query = { filename: `.changeset/${fileName}.md`, value: template, message: encodeURIComponent(commitMessage) };
+    const encodedQuery = Object.entries(query)
+        .map(([key, value]) => `${key}=${value}`)
+        .join('&');
+    return `${origin}${pathname}?${encodedQuery}`;
 }
-function getChangedPackagesGithubComment({ changedPackages, pullRequest, skipLabel, }) {
-    return [
-        `> ${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}`,
-        '',
-        `\`${changedPackages.join('`, `')}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
-        '',
-        `${skipLabel != null ? `만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.` : ''}`,
-        '',
-        '.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요',
-        '',
+const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`;
+function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, skipLabel, }) {
+    const labelComment = skipLabel
+        ? isKoreanLanguage
+            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`]
+            : [`If no version change is needed, please add ${skipLabel} to the label.`]
+        : [];
+    const bumpComment = [
         `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
         `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
         `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
+    ];
+    const packageNames = changedPackages.join('`, `');
+    if (isKoreanLanguage) {
+        return [
+            '### ⚠️ Changeset 파일을 찾을 수 없습니다',
+            '',
+            `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
+            '',
+            ...labelComment,
+            '',
+            '.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.',
+            '',
+            ...bumpComment,
+            '',
+            checksum,
+        ].join('\n');
+    }
+    return [
+        '### ⚠️ No Changeset found',
+        '',
+        `\`${packageNames}\` package${changedPackages.length > 1 ? 's' : ''} have detected changes.`,
+        '',
+        ...labelComment,
+        '',
+        'If you want to add changes to .changeset, please select one of the following options.',
+        '',
+        ...bumpComment,
+        '',
+        checksum,
     ].join('\n');
 }
-function getChangesetEmptyGithubComment() {
+function getChangesetEmptyGithubComment({ isKoreanLanguage }) {
+    if (isKoreanLanguage) {
+        return [
+            '### 🔍 변경된 파일이 없습니다.',
+            '',
+            'commit을 확인해주세요.',
+            'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
+            '',
+            checksum,
+        ].join('\n');
+    }
     return [
-        `> ${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}`,
+        '### 🔍 No files have been changed',
         '',
-        '변경된 파일이 없습니다. commit을 확인해주세요.',
-        'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
+        'Please check your commit.',
+        'If packages_dir is not specified or only markdown files are in the changes, detection may fail.',
+        '',
+        checksum,
     ].join('\n');
 }
 
