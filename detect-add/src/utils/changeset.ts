@@ -63,6 +63,11 @@ export function getChangedPackagesGithubComment({
     isKoreanLanguage: boolean
     skipLabel?: string
 }) {
+    const commitComment = pullRequest.head?.sha
+        ? isKoreanLanguage
+            ? [`마지막 commit: ${pullRequest.head.sha}`]
+            : [`Latest commit: ${pullRequest.head.sha}`]
+        : []
     const labelComment = skipLabel
         ? isKoreanLanguage
             ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`]
@@ -80,6 +85,8 @@ export function getChangedPackagesGithubComment({
         return [
             '### ⚠️ Changeset 파일을 찾을 수 없습니다',
             '',
+            ...commitComment,
+            '',
             `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
             '',
             ...labelComment,
@@ -94,6 +101,8 @@ export function getChangedPackagesGithubComment({
     return [
         '### ⚠️ No Changeset found',
         '',
+        ...commitComment,
+        '',
         `\`${packageNames}\` package${changedPackages.length > 1 ? 's' : ''} have detected changes.`,
         '',
         ...labelComment,
@@ -106,12 +115,26 @@ export function getChangedPackagesGithubComment({
     ].join('\n')
 }
 
-export function getChangesetEmptyGithubComment({isKoreanLanguage}: {isKoreanLanguage: boolean}) {
+export function getChangesetEmptyGithubComment({
+    isKoreanLanguage,
+    pullRequest,
+}: {
+    isKoreanLanguage: boolean
+    pullRequest: PullRequest
+}) {
+    const commitComment = pullRequest.head?.sha
+        ? isKoreanLanguage
+            ? [`마지막 commit: ${pullRequest.head.sha}`]
+            : [`Latest commit: ${pullRequest.head.sha}`]
+        : []
     if (isKoreanLanguage) {
         return [
             '### 🔍 변경된 파일이 없습니다.',
             '',
+            ...commitComment,
+            '',
             'commit을 확인해주세요.',
+            '',
             'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
             '',
             checksum,
@@ -120,7 +143,10 @@ export function getChangesetEmptyGithubComment({isKoreanLanguage}: {isKoreanLang
     return [
         '### 🔍 No files have been changed',
         '',
+        ...commitComment,
+        '',
         'Please check your commit.',
+        '',
         'If packages_dir is not specified or only markdown files are in the changes, detection may fail.',
         '',
         checksum,

@@ -131,7 +131,7 @@ async function main() {
 
     // 변경된 패키지가 없다면 Empty 메시지를 남긴다.
     if (changedPackages.length === 0) {
-        const emptyCommentContent = getChangesetEmptyGithubComment({isKoreanLanguage})
+        const emptyCommentContent = getChangesetEmptyGithubComment({isKoreanLanguage, pullRequest: pull_request})
         const emptyComment = {...commonParams, body: emptyCommentContent}
         if (prevComment !== undefined) {
             await octokit.rest.issues.updateComment({...emptyComment, comment_id: prevComment.id})

@@ -33921,7 +33921,7 @@ function main() {
         });
         // 변경된 패키지가 없다면 Empty 메시지를 남긴다.
         if (changedPackages.length === 0) {
-            const emptyCommentContent = (0, changeset_1.getChangesetEmptyGithubComment)({ isKoreanLanguage });
+            const emptyCommentContent = (0, changeset_1.getChangesetEmptyGithubComment)({ isKoreanLanguage, pullRequest: pull_request });
             const emptyComment = Object.assign(Object.assign({}, commonParams), { body: emptyCommentContent });
             if (prevComment !== undefined) {
                 yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, emptyComment), { comment_id: prevComment.id }));
@@ -33998,6 +33998,12 @@ function getAddChangesetUrl(changedPackageNames, pull_request, versionType) {
 }
 const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`;
 function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, skipLabel, }) {
+    var _a;
+    const commitComment = ((_a = pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha)
+        ? isKoreanLanguage
+            ? [`마지막 commit: ${pullRequest.head.sha}`]
+            : [`Latest commit: ${pullRequest.head.sha}`]
+        : [];
     const labelComment = skipLabel
         ? isKoreanLanguage
             ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`]
@@ -34013,6 +34019,8 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
         return [
             '### ⚠️ Changeset 파일을 찾을 수 없습니다',
             '',
+            ...commitComment,
+            '',
             `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
             '',
             ...labelComment,
@@ -34027,6 +34035,8 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
     return [
         '### ⚠️ No Changeset found',
         '',
+        ...commitComment,
+        '',
         `\`${packageNames}\` package${changedPackages.length > 1 ? 's' : ''} have detected changes.`,
         '',
         ...labelComment,
@@ -34038,12 +34048,21 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
         checksum,
     ].join('\n');
 }
-function getChangesetEmptyGithubComment({ isKoreanLanguage }) {
+function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
+    var _a;
+    const commitComment = ((_a = pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha)
+        ? isKoreanLanguage
+            ? [`마지막 commit: ${pullRequest.head.sha}`]
+            : [`Latest commit: ${pullRequest.head.sha}`]
+        : [];
     if (isKoreanLanguage) {
         return [
             '### 🔍 변경된 파일이 없습니다.',
             '',
+            ...commitComment,
+            '',
             'commit을 확인해주세요.',
+            '',
             'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
             '',
             checksum,
@@ -34052,7 +34071,10 @@ function getChangesetEmptyGithubComment({ isKoreanLanguage }) {
     return [
         '### 🔍 No files have been changed',
         '',
+        ...commitComment,
+        '',
         'Please check your commit.',
+        '',
         'If packages_dir is not specified or only markdown files are in the changes, detection may fail.',
         '',
         checksum,
