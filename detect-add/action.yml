@@ -22,7 +22,11 @@ inputs:
     formatting_script:
         description: ".changeset/*.md 파일 포매팅이 필요하다면 script 명령어를 추가해주세요"
         required: false
-    excludes: 
+    excludes:
         description: "제외할 경로"
         required: false
         default: ".github,.changeset"
+    language:
+        description: "detect add comment의 언어 설정 (en, kr 중 하나를 설정해주세요.)"
+        required: false
+        default: "en"

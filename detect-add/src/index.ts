@@ -23,6 +23,14 @@ async function main() {
     const githubToken = core.getInput('github_token')
     const octokit = github.getOctokit(githubToken)
 
+    const language = core.getInput('language') || 'en'
+
+    if (!['en', 'kr'].includes(language)) {
+        throw new Error(
+            `지원하지 않는 language 값이 주입되었습니다. en 이나 kr을 사용해주세요. (현재 값 : ${language})`,
+        )
+    }
+
     /**
      * 변경된 파일 이름을 가져오기위한 api
      * TODO: lib/apis/issueFetch 로 이동
@@ -62,7 +70,6 @@ async function main() {
     /**
      * 변경된 파일 이름을 가져오기위한 api
      */
-
     const packages_dir = core.getInput('packages_dir')
     const excludes = core.getInput('excludes') ?? ''
 
@@ -127,16 +134,11 @@ async function main() {
                 body: getChangesetEmptyGithubComment(),
             })
         }
-
         return
     }
 
     // 변경된 패키지들의 정보를 바탕으로 메시지를 생성한다.
-    const comment = getChangedPackagesGithubComment({
-        changedPackages,
-        pullRequest: pull_request,
-        skipLabel,
-    })
+    const comment = getChangedPackagesGithubComment({changedPackages, pullRequest: pull_request, skipLabel})
 
     if (prevComment !== undefined) {
         await octokit.rest.issues.updateComment({

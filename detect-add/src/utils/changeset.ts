@@ -33,10 +33,7 @@ export function getAddChangesetUrl(
     },
     versionType: VERSION,
 ) {
-    const fileName = humanId({
-        separator: '-',
-        capitalize: false,
-    })
+    const fileName = humanId({separator: '-', capitalize: false})
 
     const commitMessage = `[${versionType}] ${fileName}`
 
@@ -83,9 +80,13 @@ export function getChangedPackagesGithubComment({
 
 export function getChangesetEmptyGithubComment() {
     return [
-        `> ${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}`,
+        ``,
         '',
         '변경된 파일이 없습니다. commit을 확인해주세요.',
         'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
+        '',
+        `<a href="https://github.com/preactjs/compressed-size-action">
+            <sub>${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub>
+        </a>`,
     ].join('\n')
 }
