@@ -33997,7 +33997,11 @@ function getAddChangesetUrl(changedPackageNames, pull_request, versionType) {
         .join('&');
     return `${origin}${pathname}?${encodedQuery}`;
 }
-const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>powered by: ${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`;
+const checksum = `
+    <sub>powered by:</sub>
+    <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add">
+        <sub>${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub>
+    </a>`;
 function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, hasChangesetMarkdownInPullRequest, skipLabel, }) {
     var _a;
     const commitComment = ((_a = pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha)

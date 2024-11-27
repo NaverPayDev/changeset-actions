@@ -50,7 +50,11 @@ export function getAddChangesetUrl(changedPackageNames: string[], pull_request: 
     return `${origin}${pathname}?${encodedQuery}`
 }
 
-const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>powered by: ${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`
+const checksum = `
+    <sub>powered by:</sub>
+    <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add">
+        <sub>${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub>
+    </a>`
 
 export function getChangedPackagesGithubComment({
     changedPackages,
