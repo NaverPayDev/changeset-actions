@@ -70,8 +70,8 @@ export function getChangedPackagesGithubComment({
         : []
     const labelComment = skipLabel
         ? isKoreanLanguage
-            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`, '']
-            : [`If no version change is needed, please add ${skipLabel} to the label.`, '']
+            ? [`만약, 버전 변경이 필요 없다면 \`${skipLabel}\`을 label에 추가해주세요.`, '']
+            : [`If no version change is needed, please add \`${skipLabel}\` to the label.`, '']
         : []
     const bumpComment = hasChangesetMarkdownInPullRequest
         ? []
@@ -99,7 +99,7 @@ export function getChangedPackagesGithubComment({
             ...labelComment,
             hasChangesetMarkdownInPullRequest
                 ? '**이 PR의 변경 사항은 다음 버전 업데이트에 포함될 예정입니다.**'
-                : '**.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
+                : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
             '',
             ...bumpComment,
             checksumComment,
@@ -114,7 +114,7 @@ export function getChangedPackagesGithubComment({
         ...labelComment,
         hasChangesetMarkdownInPullRequest
             ? '**The changes in this PR will be included in the next version bump. **'
-            : '**If you want to add changes to .changeset, please select one of the following options.**',
+            : '**If you want to add changes to `.changeset`, please select one of the following options.**',
         '',
         ...bumpComment,
         checksumComment,
