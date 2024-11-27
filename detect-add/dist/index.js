@@ -33997,11 +33997,6 @@ function getAddChangesetUrl(changedPackageNames, pull_request, versionType) {
         .join('&');
     return `${origin}${pathname}?${encodedQuery}`;
 }
-const checksum = `
-    <sub>powered by:</sub>
-    <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add">
-        <sub>${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub>
-    </a>`;
 function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, hasChangesetMarkdownInPullRequest, skipLabel, }) {
     var _a;
     const commitComment = ((_a = pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha)
@@ -34022,12 +34017,13 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
             `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
             '',
         ];
+    const checksumComment = `<sub>powered by: <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add/${isKoreanLanguage ? 'README.ko.md' : 'README.md'}">${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</a></sub>`;
     const packageNames = changedPackages.join('`, `');
     if (isKoreanLanguage) {
         return [
             hasChangesetMarkdownInPullRequest
                 ? '### 🦋 Changeset 파일이 탐지되었습니다.'
-                : '### ⚠️ Changeset 파일을 찾을 수 없습니다',
+                : '### ⚠️ Changeset 파일을 찾을 수 없습니다.',
             '',
             ...commitComment,
             `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
@@ -34038,7 +34034,7 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
                 : '**.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
             '',
             ...bumpComment,
-            checksum,
+            checksumComment,
         ].join('\n');
     }
     return [
@@ -34053,7 +34049,7 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
             : '**If you want to add changes to .changeset, please select one of the following options.**',
         '',
         ...bumpComment,
-        checksum,
+        checksumComment,
     ].join('\n');
 }
 function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
@@ -34063,6 +34059,7 @@ function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
             ? [`마지막 commit: ${pullRequest.head.sha}`]
             : [`Latest commit: ${pullRequest.head.sha}`]
         : [];
+    const checksumComment = `<sub>powered by: <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add/${isKoreanLanguage ? 'README.ko.md' : 'README.md'}">${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</a></sub>`;
     if (isKoreanLanguage) {
         return [
             '### 🔍 변경된 파일이 없습니다.',
@@ -34073,7 +34070,7 @@ function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
             '',
             'packages_dir 지정이 안되어 있거나, markdown 파일만 변경점에 있다면, 탐지되지 않을 수 있습니다.',
             '',
-            checksum,
+            checksumComment,
         ].join('\n');
     }
     return [
@@ -34085,7 +34082,7 @@ function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
         '',
         'If packages_dir is not specified or only markdown files are in the changes, detection may fail.',
         '',
-        checksum,
+        checksumComment,
     ].join('\n');
 }
 

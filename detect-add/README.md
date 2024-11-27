@@ -1,15 +1,15 @@
 # changesets-detect-add
 
-## 설명
+## Description
 
-- changeset을 이용한 패키지 배포 플로우를 사용할 때, 해당 PR의 변경점을 파악하여 `.changeset` 하위에 변경된 파일을 기재할 수 있도록 유도하는 action 입니다.
+- This action is designed to work with the changeset-based package release flow. It detects changes in the current PR and guides you to document the changes in a file under `.changeset`.
 
-## 사용 방법
+## How to Use
 
-- 프로젝트 root의 `.github/workflows` 경로에 아래와 같이 `.yaml` 파일을 작성합니다.
+- Create a `.yaml` file under the `.github/workflows` directory in the root of your project as shown below:
 
 ```yaml
-# 기호에 맞게 변경해주세요
+# Adjust according to your preferences
 name: changeset-detect-add
 on:
     pull_request:
@@ -26,14 +26,14 @@ jobs:
                   ref: ${{ github.head_ref }}
             - uses: NaverPayDev/changeset-actions/actions/detect-add@main
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
-                  skip_branches: main # skip할 브랜치들을 적어주세요. (default : master,main,develop) 
-                  skip_label: skip_detect_label # 해당 액션을 skip할 label의 이름을 적어주세요. (default: skip-detect-change) 
-                  packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share) 
-                  formatting_script: pnpm run markdownlint:fix # 생성되는 md 파일의 formatting이 필요하다면 추가해주세요
-                  excludes: ".turbo,.github" # 변경감지를 제외하고싶은 파일 또는 폴더 경로
+                  github_token: ${{ secrets.GITHUB_TOKEN }} # If needed, use the user's PAT.
+                  skip_branches: main # Specify branches to skip. (default: master, main, develop)
+                  skip_label: skip_detect_label # Specify the label name to skip this action. (default: skip-detect-change)
+                  packages_dir: packages # Specify the folder(s) where package changes are detected. (default: packages, share)
+                  formatting_script: pnpm run markdownlint:fix # Add a formatting script if required for the generated md file.
+                  excludes: ".turbo,.github" # Specify file or folder paths to exclude from change detection.
 ```
 
-## 실행 결과
+## Execution Results
 
 ![example](./src/assets/example.png)
