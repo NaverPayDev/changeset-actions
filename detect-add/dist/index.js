@@ -33847,8 +33847,6 @@ function main() {
         if (!['en', 'kr'].includes(language)) {
             throw new Error(`An unsupported language value has been provided. Please use either \`en\` or \`kr\`. (Current value: ${language})`);
         }
-        // eslint-disable-next-line no-console
-        console.log(pull_request);
         const commonParams = { owner, repo, issue_number: pullNumber };
         /**
          * 변경된 파일 이름을 가져오기위한 api

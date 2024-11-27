@@ -33,9 +33,6 @@ async function main() {
         )
     }
 
-    // eslint-disable-next-line no-console
-    console.log(pull_request)
-
     const commonParams = {owner, repo, issue_number: pullNumber}
 
     /**
