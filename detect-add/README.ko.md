@@ -36,4 +36,14 @@ jobs:
 
 ## 실행 결과
 
-![example](./src/assets/example.png)
+### 아무런 변경 사항이 없는 경우
+
+![not-changed](./src/assets/ko/not-changed.png)
+
+### 변경사항이 있으나, 해당 PR changeset이 포함되지 않은 경우
+
+![non-detected](./src/assets/ko/non-detected.png)
+
+### 변경사항이 있고, 해당 PR에 changeset이 추가되어 있는 경우
+
+![detected](./src/assets/ko/detected.png)

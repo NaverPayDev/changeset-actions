@@ -36,4 +36,14 @@ jobs:
 
 ## Execution Results
 
-![example](./src/assets/example.png)
+### When there are no changes
+
+![not-changed](./src/assets/en/not-changed.png)
+
+### When there are changes, but no changeset is included in the PR
+
+![non-detected](./src/assets/en/non-detected.png)
+
+### When there are changes, and a changeset is included in the PR
+
+![detected](./src/assets/en/detected.png)
