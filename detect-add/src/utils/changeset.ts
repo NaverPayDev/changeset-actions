@@ -50,67 +50,72 @@ export function getAddChangesetUrl(changedPackageNames: string[], pull_request: 
     return `${origin}${pathname}?${encodedQuery}`
 }
 
-const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`
+const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>powered by: ${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`
 
 export function getChangedPackagesGithubComment({
     changedPackages,
     pullRequest,
     isKoreanLanguage,
+    hasChangesetMarkdownInPullRequest,
     skipLabel,
 }: {
     changedPackages: string[]
     pullRequest: PullRequest
     isKoreanLanguage: boolean
+    hasChangesetMarkdownInPullRequest: boolean
     skipLabel?: string
 }) {
     const commitComment = pullRequest.head?.sha
         ? isKoreanLanguage
-            ? [`마지막 commit: ${pullRequest.head.sha}`]
-            : [`Latest commit: ${pullRequest.head.sha}`]
+            ? [`마지막 commit: ${pullRequest.head.sha}`, '']
+            : [`Latest commit: ${pullRequest.head.sha}`, '']
         : []
     const labelComment = skipLabel
         ? isKoreanLanguage
-            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`]
-            : [`If no version change is needed, please add ${skipLabel} to the label.`]
+            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`, '']
+            : [`If no version change is needed, please add ${skipLabel} to the label.`, '']
         : []
-    const bumpComment = [
-        `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
-        `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
-        `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
-    ]
+    const bumpComment = hasChangesetMarkdownInPullRequest
+        ? []
+        : [
+              `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
+              `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
+              `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
+              '',
+          ]
 
     const packageNames = changedPackages.join('`, `')
 
     if (isKoreanLanguage) {
         return [
-            '### ⚠️ Changeset 파일을 찾을 수 없습니다',
+            hasChangesetMarkdownInPullRequest
+                ? '### 🦋 Changeset 파일이 탐지되었습니다.'
+                : '### ⚠️ Changeset 파일을 찾을 수 없습니다',
             '',
             ...commitComment,
-            '',
             `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
             '',
             ...labelComment,
-            '',
-            '.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.',
+            hasChangesetMarkdownInPullRequest
+                ? '**이 PR의 변경 사항은 다음 버전 업데이트에 포함될 예정입니다.**'
+                : '**.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
             '',
             ...bumpComment,
-            '',
             checksum,
         ].join('\n')
     }
     return [
-        '### ⚠️ No Changeset found',
+        hasChangesetMarkdownInPullRequest ? '### 🦋 Changeset detected' : '### ⚠️ No Changeset found',
         '',
         ...commitComment,
-        '',
         `\`${packageNames}\` package${changedPackages.length > 1 ? 's' : ''} have detected changes.`,
         '',
         ...labelComment,
-        '',
-        'If you want to add changes to .changeset, please select one of the following options.',
+        hasChangesetMarkdownInPullRequest
+            ? '**The changes in this PR will be included in the next version bump. **'
+            : '**If you want to add changes to .changeset, please select one of the following options.**',
         '',
         ...bumpComment,
-        '',
         checksum,
     ].join('\n')
 }

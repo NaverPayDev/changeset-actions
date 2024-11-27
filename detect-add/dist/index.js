@@ -33802,7 +33802,7 @@ function wrappy (fn, cb) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = void 0;
-exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = 'naverpay-changeset-detect-add-actions';
+exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = 'naverpay changeset detect-add actions';
 
 
 /***/ }),
@@ -33892,8 +33892,8 @@ function main() {
         const allChangedFiles = yield (0, utils_1.getChangedAllFiles)({ pullNumber });
         // formatting_script 가 존재하고 변경된 파일중에 .changeset/*.md 가 존재한다면
         const formattingScript = core.getInput('formatting_script');
-        if (formattingScript != null &&
-            allChangedFiles.some(({ filename }) => filename.startsWith('.changeset/') && filename.endsWith('.md'))) {
+        const hasChangesetMarkdownInPullRequest = allChangedFiles.some(({ filename }) => filename.startsWith('.changeset/') && filename.endsWith('.md'));
+        if (formattingScript != null && hasChangesetMarkdownInPullRequest) {
             const currentBranch = process.env.GITHUB_HEAD_REF;
             try {
                 // formatting 명령어 실행
@@ -33936,6 +33936,7 @@ function main() {
             changedPackages,
             pullRequest: pull_request,
             isKoreanLanguage,
+            hasChangesetMarkdownInPullRequest,
             skipLabel,
         });
         const comment = Object.assign(Object.assign({}, commonParams), { body: commentContent });
@@ -33996,55 +33997,58 @@ function getAddChangesetUrl(changedPackageNames, pull_request, versionType) {
         .join('&');
     return `${origin}${pathname}?${encodedQuery}`;
 }
-const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`;
-function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, skipLabel, }) {
+const checksum = `<a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add"><sub>powered by: ${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</sub></a>`;
+function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKoreanLanguage, hasChangesetMarkdownInPullRequest, skipLabel, }) {
     var _a;
     const commitComment = ((_a = pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha)
         ? isKoreanLanguage
-            ? [`마지막 commit: ${pullRequest.head.sha}`]
-            : [`Latest commit: ${pullRequest.head.sha}`]
+            ? [`마지막 commit: ${pullRequest.head.sha}`, '']
+            : [`Latest commit: ${pullRequest.head.sha}`, '']
         : [];
     const labelComment = skipLabel
         ? isKoreanLanguage
-            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`]
-            : [`If no version change is needed, please add ${skipLabel} to the label.`]
+            ? [`만약, 버전 변경이 필요 없다면 ${skipLabel}을 label에 추가해주세요.`, '']
+            : [`If no version change is needed, please add ${skipLabel} to the label.`, '']
         : [];
-    const bumpComment = [
-        `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
-        `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
-        `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
-    ];
+    const bumpComment = hasChangesetMarkdownInPullRequest
+        ? []
+        : [
+            `X.0.0 [major bump](${getAddChangesetUrl(changedPackages, pullRequest, 'major')})`,
+            `0.X.0 [minor bump](${getAddChangesetUrl(changedPackages, pullRequest, 'minor')})`,
+            `0.0.X [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
+            '',
+        ];
     const packageNames = changedPackages.join('`, `');
     if (isKoreanLanguage) {
         return [
-            '### ⚠️ Changeset 파일을 찾을 수 없습니다',
+            hasChangesetMarkdownInPullRequest
+                ? '### 🦋 Changeset 파일이 탐지되었습니다.'
+                : '### ⚠️ Changeset 파일을 찾을 수 없습니다',
             '',
             ...commitComment,
-            '',
             `\`${packageNames}\` 패키지${changedPackages.length > 1 ? '들' : ''}에 변경사항이 감지되었습니다.`,
             '',
             ...labelComment,
-            '',
-            '.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.',
+            hasChangesetMarkdownInPullRequest
+                ? '**이 PR의 변경 사항은 다음 버전 업데이트에 포함될 예정입니다.**'
+                : '**.changeset에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
             '',
             ...bumpComment,
-            '',
             checksum,
         ].join('\n');
     }
     return [
-        '### ⚠️ No Changeset found',
+        hasChangesetMarkdownInPullRequest ? '### 🦋 Changeset detected' : '### ⚠️ No Changeset found',
         '',
         ...commitComment,
-        '',
         `\`${packageNames}\` package${changedPackages.length > 1 ? 's' : ''} have detected changes.`,
         '',
         ...labelComment,
-        '',
-        'If you want to add changes to .changeset, please select one of the following options.',
+        hasChangesetMarkdownInPullRequest
+            ? '**The changes in this PR will be included in the next version bump. **'
+            : '**If you want to add changes to .changeset, please select one of the following options.**',
         '',
         ...bumpComment,
-        '',
         checksum,
     ].join('\n');
 }

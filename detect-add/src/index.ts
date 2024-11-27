@@ -98,10 +98,11 @@ async function main() {
     // formatting_script 가 존재하고 변경된 파일중에 .changeset/*.md 가 존재한다면
     const formattingScript = core.getInput('formatting_script')
 
-    if (
-        formattingScript != null &&
-        allChangedFiles.some(({filename}) => filename.startsWith('.changeset/') && filename.endsWith('.md'))
-    ) {
+    const hasChangesetMarkdownInPullRequest = allChangedFiles.some(
+        ({filename}) => filename.startsWith('.changeset/') && filename.endsWith('.md'),
+    )
+
+    if (formattingScript != null && hasChangesetMarkdownInPullRequest) {
         const currentBranch = process.env.GITHUB_HEAD_REF as string
 
         try {
@@ -146,6 +147,7 @@ async function main() {
         changedPackages,
         pullRequest: pull_request,
         isKoreanLanguage,
+        hasChangesetMarkdownInPullRequest,
         skipLabel,
     })
     const comment = {...commonParams, body: commentContent}
