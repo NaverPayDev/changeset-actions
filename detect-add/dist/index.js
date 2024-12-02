@@ -33843,9 +33843,9 @@ function main() {
         const githubToken = core.getInput('github_token');
         const octokit = github.getOctokit(githubToken);
         const language = core.getInput('language') || 'en';
-        const isKoreanLanguage = language === 'kr';
-        if (!['en', 'kr'].includes(language)) {
-            throw new Error(`An unsupported language value has been provided. Please use either \`en\` or \`kr\`. (Current value: ${language})`);
+        const isKoreanLanguage = language === 'ko';
+        if (!['en', 'ko'].includes(language)) {
+            throw new Error(`An unsupported language value has been provided. Please use either \`en\` or \`ko\`. (Current value: ${language})`);
         }
         const commonParams = { owner, repo, issue_number: pullNumber };
         /**
