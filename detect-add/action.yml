@@ -27,6 +27,6 @@ inputs:
         required: false
         default: ".github,.changeset"
     language:
-        description: "detect add comment의 언어 설정 (en, kr 중 하나를 설정해주세요.)"
+        description: "detect add comment의 언어 설정 (en, ko 중 하나를 설정해주세요.)"
         required: false
         default: "en"

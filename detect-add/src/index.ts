@@ -25,11 +25,11 @@ async function main() {
     const octokit = github.getOctokit(githubToken)
 
     const language = core.getInput('language') || 'en'
-    const isKoreanLanguage = language === 'kr'
+    const isKoreanLanguage = language === 'ko'
 
-    if (!['en', 'kr'].includes(language)) {
+    if (!['en', 'ko'].includes(language)) {
         throw new Error(
-            `An unsupported language value has been provided. Please use either \`en\` or \`kr\`. (Current value: ${language})`,
+            `An unsupported language value has been provided. Please use either \`en\` or \`ko\`. (Current value: ${language})`,
         )
     }
 
