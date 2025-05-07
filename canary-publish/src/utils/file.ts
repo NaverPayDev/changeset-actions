@@ -36,7 +36,7 @@ export async function getChangedPackages({
         return acc
     }, new Set<string>())
 
-    console.log('필터링된 packages', Array.from(changedPackages)) // eslint-disable-line
+    console.log('Packages filtered: ', Array.from(changedPackages)) // eslint-disable-line
 
     return Array.from(changedPackages)
 }

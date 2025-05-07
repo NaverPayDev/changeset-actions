@@ -53315,7 +53315,7 @@ function main() {
                 changedFiles,
             });
             if (changedPackageInfos.length === 0) {
-                core.info('변경된 패키지가 없습니다.');
+                core.info('No changed packages found.');
                 return;
             }
             yield Promise.all([
@@ -53472,7 +53472,7 @@ function getChangedPackages(_a) {
             }
             return acc;
         }, new Set());
-        console.log('필터링된 packages', Array.from(changedPackages)); // eslint-disable-line
+        console.log('Packages filtered: ', Array.from(changedPackages)); // eslint-disable-line
         return Array.from(changedPackages);
     });
 }
