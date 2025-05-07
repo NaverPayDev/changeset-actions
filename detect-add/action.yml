@@ -1,32 +1,32 @@
-name: "changesets-detect-add"
-description: "changeset을 이용한 패키지 배포 플로우를 사용할 때, 해당 PR의 변경점을 파악하여 `.changeset` 하위에 변경된 파일을 기재할 수 있도록 유도하는 action 입니다."
+name: 'changesets-detect-add'
+description: 'Detect changes in the PR and add them to the changeset'
 runs:
-    using: "node16"
-    main: "dist/index.js"
+    using: 'node20'
+    main: 'dist/index.js'
 inputs:
     github_token:
-        description: "get github token (필요하면 user의 PAT을 넣어주세요.)"
+        description: 'github token to use for the action'
         required: true
     skip_branches:
-        description: "skip할 브랜치들을 적어주세요."
+        description: 'branches to skip the action'
         required: false
-        default: "master,main,develop"
+        default: 'master,main,develop'
     skip_label:
-        description: "해당 액션을 skip할 label의 이름을 적어주세요."
+        description: 'add a label to skip the action'
         required: false
-        default: "skip-detect-change"
+        default: 'skip-detect-change'
     packages_dir:
-        description: "변경을 탐지할 패키지들의 폴더명을 추가해주세요."
+        description: 'add folder name to detect changes'
         required: false
-        default: "packages,share"
+        default: 'packages,share'
     formatting_script:
-        description: ".changeset/*.md 파일 포매팅이 필요하다면 script 명령어를 추가해주세요"
+        description: 'add a formatting script when needing to format the .changeset/*.md files'
         required: false
     excludes:
-        description: "제외할 경로"
+        description: 'path to exclude when detecting changes'
         required: false
-        default: ".github,.changeset"
+        default: '.github,.changeset'
     language:
-        description: "detect add comment의 언어 설정 (en, ko 중 하나를 설정해주세요.)"
+        description: 'language to use for the changeset'
         required: false
-        default: "en"
+        default: 'en'

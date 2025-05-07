@@ -1,6 +1,6 @@
 {
     "name": "@naverpay/changeset-actions/publish",
-    "description": "changeset 기반 publish",
+    "description": "publish action based on changeset",
     "sideEffects": false,
     "version": "0.0.1",
     "main": "./dist/index.js",

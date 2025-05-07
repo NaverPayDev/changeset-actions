@@ -1,6 +1,6 @@
 # @NaverPayDev/changeset-actions
 
-> [한글 README 보기](./README.ko.md)
+> lang: En | [Ko](./README.ko.md)
 
 - A repository containing various actions based on changesets.
 - This repository follows a monorepo structure and includes multiple actions, allowing you to use only the actions you need.

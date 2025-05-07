@@ -5,7 +5,7 @@
         "type": "git",
         "url": "https://github.com/NaverPayDev/changeset-actions.git"
     },
-    "description": "changeset 기반의 actions",
+    "description": "Changeset actions for GitHub",
     "version": "0.0.0",
     "scripts": {
         "start": "turbo run start",

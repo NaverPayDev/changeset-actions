@@ -1,7 +1,7 @@
 name: 'changesets-canary-publish'
-description: 'changesets canary publish'
+description: 'changesets canary publish to differentiate from normal publish'
 runs:
-    using: 'node16'
+    using: 'node20'
     main: 'dist/index.js'
 inputs:
     github_token:
@@ -18,11 +18,11 @@ inputs:
         description: 'canary deploy script'
         required: true
     packages_dir:
-        description: '패키지 디렉터리'
+        description: 'directory to publish'
         required: false
         default: 'packages,share'
     excludes:
-        description: '제외할 경로'
+        description: 'path to exclude from canary publish'
         required: false
         default: '.github,.changeset'
     version_template:
