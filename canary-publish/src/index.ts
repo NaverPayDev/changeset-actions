@@ -116,7 +116,9 @@ async function main() {
                 },
             )
 
-            core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`)
+            core.info(
+                `✅ [${packageJson.name}] Previous version: ${packageJson.version} / 😘 Next version: ${newVersion}`,
+            )
 
             packageJson.version = newVersion
 
@@ -126,7 +128,7 @@ async function main() {
         const dryRun = core.getBooleanInput('dry_run')
 
         if (dryRun) {
-            core.info('카나리 배포를 위한 dry run 입니다.')
+            core.info('This is dry run for Canary distribution.')
             return
         }
 

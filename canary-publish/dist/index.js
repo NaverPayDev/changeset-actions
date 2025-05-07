@@ -53365,13 +53365,13 @@ function main() {
                     var _a;
                     return (_a = replacements[key]) !== null && _a !== void 0 ? _a : '';
                 });
-                core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
+                core.info(`✅ [${packageJson.name}] Previous version: ${packageJson.version} / 😘 Next version: ${newVersion}`);
                 packageJson.version = newVersion;
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             });
             const dryRun = core.getBooleanInput('dry_run');
             if (dryRun) {
-                core.info('카나리 배포를 위한 dry run 입니다.');
+                core.info('This is dry run for Canary distribution.');
                 return;
             }
             // 변경된 버전으로 카나리 배포
@@ -53490,7 +53490,7 @@ function protectUnchangedPackages(changedPackages) {
         for (const packageJsonPath of allPackageJSON) {
             if (!changedPackages.includes(packageJsonPath)) {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-                core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`);
+                core.info(`🔨 [${packageJson.name}] Add private:true option.`);
                 packageJson.private = true;
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             }
@@ -53502,7 +53502,7 @@ function removeChangesetMdFiles(_a) {
         const markdownPaths = yield (0, fast_glob_1.default)('.changeset/*.md');
         return Promise.all(markdownPaths.map((markdownPath) => __awaiter(this, void 0, void 0, function* () {
             if (changedFiles.find(({ filename }) => filename === markdownPath) == null) {
-                console.log(`PR과 관련없는 ${markdownPath} 제거`); // eslint-disable-line
+                console.log(`Remove ${markdownPath} unrelated to PR`); // eslint-disable-line
                 yield fs.remove(markdownPath);
             }
         })));
