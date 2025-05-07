@@ -41,12 +41,16 @@ jobs:
             - name: Canary Publish
               uses: NaverPayDev/changeset-actions/canary-publish@main
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }} # Add user PAT if necessary
-                  npm_tag: canary # Specify the npm tag to use for deployment
-                  npm_token: ${{ secrets.NPM_TOKEN }} # Provide the token required for npm publishing
-                  publish_script: pnpm run deploy:canary # Script to execute Canary deployment
-                  packages_dir: packages # Directory of packages to detect changes (default: packages,share)
-                  excludes: ".turbo,.github" # Files or directories to exclude from change detection
+                  github_token: ${{ secrets.GITHUB_TOKEN }}           # (Required) GitHub API token for authentication. Use a user PAT if necessary.
+                  npm_tag: canary                                    # (Optional) The npm tag to use for deployment (e.g., canary, beta).
+                  npm_token: ${{ secrets.NPM_TOKEN }}                # (Required) Token used for npm publishing.
+                  publish_script: pnpm run deploy:canary             # (Required) Script command to execute the canary deployment.
+                  packages_dir: packages                             # (Optional) Directory containing packages to check for changes (default: packages,share).
+                  excludes: ".turbo,.github"                         # (Optional) Files or directories to exclude from change detection (comma-separated).
+                  version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (Optional) Template for the canary version string.
+                  dry_run: false                                     # (Optional) If true, performs a dry run without publishing.
+                  language: 'en'                                     # (Optional) Language for output messages (e.g., en, ko).
+                  create_release: false                              # (Optional) If true, creates a GitHub Release after canary publishing.
 ```
 
 ## Execution Results

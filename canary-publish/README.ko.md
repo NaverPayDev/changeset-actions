@@ -41,12 +41,16 @@ jobs:
             - name: Canary Publish
               uses: NaverPayDev/changeset-actions/canary-publish@main
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
-                  npm_tag: canary # npm 배포 시 달아줄 태그는 무엇으로 할지적어주세요
-                  npm_token: ${{ secrets.NPM_TOKEN }} # npm 배포시 필요한 publish token 을 넣어주세요 
-                  publish_script: pnpm run deploy:canary # canary 배포 실행 script 를 넣어주세요
-                  packages_dir: packages # 변경을 탐지할 패키지들의 폴더명을 추가해주세요. (default: packages,share)       
-                  excludes: ".turbo,.github" # 변경감지를 제외하고싶은 파일 또는 폴더 경로      
+                  github_token: ${{ secrets.GITHUB_TOKEN }}           # (필수) GitHub API 인증 토큰. 필요시 사용자 PAT로 대체 가능
+                  npm_tag: canary                                    # (선택) 배포에 사용할 npm 태그 (예: canary, beta 등)
+                  npm_token: ${{ secrets.NPM_TOKEN }}                # (필수) npm publish를 위한 인증 토큰
+                  publish_script: pnpm run deploy:canary             # (필수) Canary 배포를 실행할 스크립트 명령어
+                  packages_dir: packages                             # (선택) 변경 감지에 사용할 패키지 디렉터리 (기본값: packages,share)
+                  excludes: ".turbo,.github"                         # (선택) 변경 감지에서 제외할 파일/디렉터리 목록 (쉼표로 구분)
+                  version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (선택) Canary 버전명 템플릿
+                  dry_run: false                                     # (선택) true면 실제 배포 없이 시뮬레이션만 수행
+                  language: 'en'                                     # (선택) 메시지 언어 설정 (en, ko 등)
+                  create_release: false                              # (선택) true면 Canary 배포 후 GitHub Release 자동 생성   
 ```
 
 ## 실행 결과
