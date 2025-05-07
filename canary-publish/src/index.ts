@@ -13,6 +13,12 @@ import {getPublishedPackageInfos} from './utils/publish'
 
 const cwd = process.cwd()
 
+const VERSION_TEMPLATE_CONSTANTS = {
+    version: 'VERSION',
+    date: 'DATE',
+    commitId7: 'COMMITID7',
+}
+
 async function main() {
     // npmrc 설정
     await setNpmRc()
@@ -81,11 +87,32 @@ async function main() {
         }
         fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8')
 
+        const versionTemplate = core.getInput('version_template')
+
         // 변경된 패키지들의 버전을 강제로 치환합니다
         changedPackageInfos.forEach((packageJsonPath) => {
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
-            const newVersion = `${packageJson.version}-${npmTag}-${(pullRequestInfo.head.sha as string).slice(0, 7)}`
+            const today = new Date()
+            const pad = (n: number) => n.toString().padStart(2, '0')
+            const year2 = today.getFullYear().toString().slice(2)
+            const dateStr = `${year2}${pad(today.getMonth() + 1)}${pad(today.getDate())}` // YYYYMMDD
+            const commitId7 = (pullRequestInfo.head.sha as string).slice(0, 7)
+            const version = packageJson.version
+
+            const replacements = {
+                [VERSION_TEMPLATE_CONSTANTS.version]: version,
+                [VERSION_TEMPLATE_CONSTANTS.date]: dateStr,
+                [VERSION_TEMPLATE_CONSTANTS.commitId7]: commitId7,
+            }
+
+            const templateConstantsString = Object.values(VERSION_TEMPLATE_CONSTANTS).join('|')
+            const newVersion = versionTemplate.replace(
+                new RegExp(`\\{(${templateConstantsString})\\}`, 'g'),
+                (_, key) => {
+                    return replacements[key] ?? ''
+                },
+            )
 
             core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`)
 
@@ -93,6 +120,13 @@ async function main() {
 
             fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8')
         })
+
+        const dryRun = core.getBooleanInput('dry_run')
+
+        if (dryRun) {
+            core.info('카나리 배포를 위한 dry run 입니다.')
+            return
+        }
 
         // 변경된 버전으로 카나리 배포
         const publishScript = core.getInput('publish_script')
@@ -115,6 +149,7 @@ async function main() {
         core.setOutput('publishedPackages', JSON.stringify(publishedPackages))
         core.setOutput('message', message)
     } catch (e) {
+        core.error((e as Error)?.message)
         issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.')
     }
 }

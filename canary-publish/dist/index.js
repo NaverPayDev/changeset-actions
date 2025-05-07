@@ -53258,6 +53258,11 @@ const file_1 = __nccwpck_require__(398);
 const npm_1 = __nccwpck_require__(6824);
 const publish_1 = __nccwpck_require__(9459);
 const cwd = process.cwd();
+const VERSION_TEMPLATE_CONSTANTS = {
+    version: 'VERSION',
+    date: 'DATE',
+    commitId7: 'COMMITID7',
+};
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -53315,14 +53320,35 @@ function main() {
                 }
             }
             fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
+            const versionTemplate = core.getInput('version_template');
             // 변경된 패키지들의 버전을 강제로 치환합니다
             changedPackageInfos.forEach((packageJsonPath) => {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-                const newVersion = `${packageJson.version}-${npmTag}-${pullRequestInfo.head.sha.slice(0, 7)}`;
+                const today = new Date();
+                const pad = (n) => n.toString().padStart(2, '0');
+                const year2 = today.getFullYear().toString().slice(2);
+                const dateStr = `${year2}${pad(today.getMonth() + 1)}${pad(today.getDate())}`; // YYYYMMDD
+                const commitId7 = pullRequestInfo.head.sha.slice(0, 7);
+                const version = packageJson.version;
+                const replacements = {
+                    [VERSION_TEMPLATE_CONSTANTS.version]: version,
+                    [VERSION_TEMPLATE_CONSTANTS.date]: dateStr,
+                    [VERSION_TEMPLATE_CONSTANTS.commitId7]: commitId7,
+                };
+                const templateConstantsString = Object.values(VERSION_TEMPLATE_CONSTANTS).join('|');
+                const newVersion = versionTemplate.replace(new RegExp(`\\{(${templateConstantsString})\\}`, 'g'), (_, key) => {
+                    var _a;
+                    return (_a = replacements[key]) !== null && _a !== void 0 ? _a : '';
+                });
                 core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
                 packageJson.version = newVersion;
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             });
+            const dryRun = core.getBooleanInput('dry_run');
+            if (dryRun) {
+                core.info('카나리 배포를 위한 dry run 입니다.');
+                return;
+            }
             // 변경된 버전으로 카나리 배포
             const publishScript = core.getInput('publish_script');
             const [publishCommand, ...publishArgs] = publishScript.split(/\s+/);
@@ -53341,6 +53367,7 @@ function main() {
             core.setOutput('message', message);
         }
         catch (e) {
+            core.error(e === null || e === void 0 ? void 0 : e.message);
             issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.');
         }
     });
@@ -53539,7 +53566,7 @@ function getPublishedPackageInfos({ packagesDir, execOutput }) {
     const publishedPackages = [];
     for (const publishOutput of execOutput.stdout.split('\n')) {
         // eslint-disable-next-line no-useless-escape
-        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(\d+\.\d+\.\d+\-[A-Za-z]+\-\w{7})$/;
+        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(.+)$/;
         const matchResult = publishOutput.trim().match(regExp);
         if (!matchResult) {
             continue;

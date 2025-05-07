@@ -7,7 +7,7 @@ export function getPublishedPackageInfos({packagesDir, execOutput}: {execOutput:
 
     for (const publishOutput of execOutput.stdout.split('\n')) {
         // eslint-disable-next-line no-useless-escape
-        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(\d+\.\d+\.\d+\-[A-Za-z]+\-\w{7})$/
+        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(.+)$/
         const matchResult = publishOutput.trim().match(regExp)
         if (!matchResult) {
             continue
