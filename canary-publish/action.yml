@@ -1,5 +1,5 @@
 name: 'changesets-canary-publish'
-description: 'changesets canary publish'
+description: 'changesets canary publish to differentiate from normal publish'
 runs:
     using: 'node20'
     main: 'dist/index.js'
