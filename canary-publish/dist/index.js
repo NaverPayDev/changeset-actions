@@ -53315,7 +53315,7 @@ function main() {
                 changedFiles,
             });
             if (changedPackageInfos.length === 0) {
-                core.info('변경된 패키지가 없습니다.');
+                core.info('No changed packages found.');
                 return;
             }
             yield Promise.all([
@@ -53472,7 +53472,7 @@ function getChangedPackages(_a) {
             }
             return acc;
         }, new Set());
-        console.log('필터링된 packages', Array.from(changedPackages)); // eslint-disable-line
+        console.log('Packages filtered: ', Array.from(changedPackages)); // eslint-disable-line
         return Array.from(changedPackages);
     });
 }
@@ -53555,6 +53555,9 @@ const core = __importStar(__nccwpck_require__(6108));
 const fs = __importStar(__nccwpck_require__(77));
 function setNpmRc() {
     return __awaiter(this, void 0, void 0, function* () {
+        // 입력값에서 npm_token 가져오기
+        const npmToken = core.getInput('npm_token');
+        process.env.NPM_TOKEN = npmToken; // 환경변수로 설정
         core.info('No changesets found, attempting to publish any unpublished packages to npm');
         const userNpmrcPath = `${process.env.HOME}/.npmrc`;
         if (fs.existsSync(userNpmrcPath)) {

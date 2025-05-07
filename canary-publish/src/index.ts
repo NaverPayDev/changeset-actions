@@ -54,7 +54,7 @@ async function main() {
         })
 
         if (changedPackageInfos.length === 0) {
-            core.info('변경된 패키지가 없습니다.')
+            core.info('No changed packages found.')
             return
         }
 
