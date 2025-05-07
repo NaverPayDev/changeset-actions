@@ -2,10 +2,19 @@ import {execSync} from 'node:child_process'
 
 import * as core from '@actions/core'
 import {ExecOutput, exec} from '@actions/exec'
+import {LANGUAGES} from 'canary-publish/src/constants/lang'
 
 import {uniqBy} from '$actions/utils'
 
-export function getPublishedPackageInfos({packagesDir, execOutput}: {execOutput: ExecOutput; packagesDir: string}) {
+export function getPublishedPackageInfos({
+    packagesDir,
+    execOutput,
+    language,
+}: {
+    execOutput: ExecOutput
+    packagesDir: string
+    language: 'ko' | 'en'
+}) {
     const publishedPackages = []
 
     for (const publishOutput of execOutput.stdout.split('\n')) {
@@ -26,7 +35,7 @@ export function getPublishedPackageInfos({packagesDir, execOutput}: {execOutput:
     const message =
         uniqPackages.length > 0
             ? ['## Published Canary Packages', '', '', '```', `${copyCodeBlock}`, '```'].join('\n')
-            : `${packagesDir} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.`
+            : LANGUAGES[language].empty.replace('{PATH}', packagesDir)
 
     return {
         message,

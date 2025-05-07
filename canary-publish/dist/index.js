@@ -53206,6 +53206,29 @@ function Node (value, prev, next, list) {
 
 /***/ }),
 
+/***/ 5264:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LANGUAGES = void 0;
+exports.LANGUAGES = {
+    en: {
+        empty: 'No changed files exist under the {PATH} path, no packages have been deployed.',
+        error: 'An error occurred during the canary deployment.',
+        failure: 'Please specify the detect version for a valid canary version deployment',
+    },
+    ko: {
+        empty: '{PATH} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.',
+        error: '카나리 배포 도중 에러가 발생했습니다.',
+        failure: '올바른 카나리 버전 배포를 위해 detect version을 명시해주세요',
+    },
+};
+
+
+/***/ }),
+
 /***/ 7630:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -53250,6 +53273,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
 const read_1 = __importDefault(__nccwpck_require__(1746));
+const lang_1 = __nccwpck_require__(5264);
 const fs = __importStar(__nccwpck_require__(77));
 const resolve_from_1 = __importDefault(__nccwpck_require__(1345));
 const apis_1 = __importDefault(__nccwpck_require__(6500));
@@ -53270,12 +53294,13 @@ function main() {
         yield (0, npm_1.setNpmRc)();
         const { pullFetchers, issueFetchers } = (0, apis_1.default)();
         const pullRequestInfo = yield pullFetchers.getPullRequestInfo();
+        const language = core.getInput('language');
         try {
             // 변경된 사항이 있는지 체크.
             // 변경사항이 있을때만 카나리를 배포 할 수 있다.
             const changesets = yield (0, read_1.default)(cwd);
             if (changesets.length === 0) {
-                yield issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요');
+                yield issueFetchers.addComment(lang_1.LANGUAGES[language].failure);
                 return;
             }
             const changedFiles = yield (0, utils_1.getChangedAllFiles)({
@@ -53358,6 +53383,7 @@ function main() {
             const { message, publishedPackages } = (0, publish_1.getPublishedPackageInfos)({
                 execOutput: changesetPublishOutput,
                 packagesDir,
+                language,
             });
             const createRelease = core.getBooleanInput('create_release');
             createRelease && (yield (0, publish_1.createReleaseForTags)(publishedPackages.map(({ name, version }) => `${name}@${version}`)));
@@ -53370,7 +53396,7 @@ function main() {
         }
         catch (e) {
             core.error(e === null || e === void 0 ? void 0 : e.message);
-            issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.');
+            issueFetchers.addComment(lang_1.LANGUAGES[language].error);
         }
     });
 }
@@ -53599,8 +53625,9 @@ exports.createReleaseForTags = createReleaseForTags;
 const node_child_process_1 = __nccwpck_require__(7718);
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
+const lang_1 = __nccwpck_require__(5264);
 const utils_1 = __nccwpck_require__(3927);
-function getPublishedPackageInfos({ packagesDir, execOutput }) {
+function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
     const publishedPackages = [];
     for (const publishOutput of execOutput.stdout.split('\n')) {
         // eslint-disable-next-line no-useless-escape
@@ -53616,7 +53643,7 @@ function getPublishedPackageInfos({ packagesDir, execOutput }) {
     const copyCodeBlock = uniqPackages.map(({ name, version }) => `${name}@${version}`).join('\n');
     const message = uniqPackages.length > 0
         ? ['## Published Canary Packages', '', '', '```', `${copyCodeBlock}`, '```'].join('\n')
-        : `${packagesDir} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.`;
+        : lang_1.LANGUAGES[language].empty.replace('{PATH}', packagesDir);
     return {
         message,
         publishedPackages: uniqPackages,

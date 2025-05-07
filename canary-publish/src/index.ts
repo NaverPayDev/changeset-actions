@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {exec, getExecOutput} from '@actions/exec'
 import readChangesets from '@changesets/read'
+import {LANGUAGES} from 'canary-publish/src/constants/lang'
 import * as fs from 'fs-extra'
 import resolveFrom from 'resolve-from'
 
@@ -25,6 +26,7 @@ async function main() {
 
     const {pullFetchers, issueFetchers} = createFetchers()
     const pullRequestInfo = await pullFetchers.getPullRequestInfo()
+    const language = core.getInput('language') as 'ko' | 'en'
 
     try {
         // 변경된 사항이 있는지 체크.
@@ -32,7 +34,7 @@ async function main() {
         const changesets = await readChangesets(cwd)
 
         if (changesets.length === 0) {
-            await issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요')
+            await issueFetchers.addComment(LANGUAGES[language].failure)
 
             return
         }
@@ -139,6 +141,7 @@ async function main() {
         const {message, publishedPackages} = getPublishedPackageInfos({
             execOutput: changesetPublishOutput,
             packagesDir,
+            language,
         })
 
         const createRelease = core.getBooleanInput('create_release')
@@ -154,7 +157,7 @@ async function main() {
         core.setOutput('message', message)
     } catch (e) {
         core.error((e as Error)?.message)
-        issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.')
+        issueFetchers.addComment(LANGUAGES[language].error)
     }
 }
 

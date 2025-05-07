@@ -37,3 +37,7 @@ inputs:
         description: 'create release with package and version'
         required: false
         default: 'false'
+    language:
+        description: 'language for release note, comment etc.'
+        required: false
+        default: 'en'
