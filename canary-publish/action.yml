@@ -1,7 +1,7 @@
 name: 'changesets-canary-publish'
 description: 'changesets canary publish'
 runs:
-    using: 'node16'
+    using: 'node20'
     main: 'dist/index.js'
 inputs:
     github_token:
