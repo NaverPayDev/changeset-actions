@@ -2,6 +2,10 @@ import * as core from '@actions/core'
 import * as fs from 'fs-extra'
 
 export async function setNpmRc() {
+    // 입력값에서 npm_token 가져오기
+    const npmToken = core.getInput('npm_token')
+    process.env.NPM_TOKEN = npmToken // 환경변수로 설정
+
     core.info('No changesets found, attempting to publish any unpublished packages to npm')
 
     const userNpmrcPath = `${process.env.HOME}/.npmrc`
