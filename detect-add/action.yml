@@ -12,15 +12,15 @@ inputs:
         required: false
         default: 'master,main,develop'
     skip_label:
-        description: 'Add a label to skip the action'
+        description: 'add a label to skip the action'
         required: false
         default: 'skip-detect-change'
     packages_dir:
-        description: 'Add folder name to detect changes'
+        description: 'add folder name to detect changes'
         required: false
         default: 'packages,share'
     formatting_script:
-        description: 'Add a formatting script when needing to format the .changeset/*.md files'
+        description: 'add a formatting script when needing to format the .changeset/*.md files'
         required: false
     excludes:
         description: 'path to exclude when detecting changes'
