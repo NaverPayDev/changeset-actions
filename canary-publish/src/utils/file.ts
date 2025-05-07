@@ -56,7 +56,7 @@ export async function protectUnchangedPackages(changedPackages: string[]) {
         if (!changedPackages.includes(packageJsonPath)) {
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
-            core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`)
+            core.info(`🔨 [${packageJson.name}] Add private:true option.`)
 
             packageJson.private = true
 
@@ -75,7 +75,7 @@ export async function removeChangesetMdFiles({
     return Promise.all(
         markdownPaths.map(async (markdownPath) => {
             if (changedFiles.find(({filename}) => filename === markdownPath) == null) {
-                console.log(`PR과 관련없는 ${markdownPath} 제거`) // eslint-disable-line
+                console.log(`Remove ${markdownPath} unrelated to PR`) // eslint-disable-line
 
                 await fs.remove(markdownPath)
             }

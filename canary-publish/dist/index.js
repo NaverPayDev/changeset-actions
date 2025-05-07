@@ -53206,6 +53206,29 @@ function Node (value, prev, next, list) {
 
 /***/ }),
 
+/***/ 5264:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LANGUAGES = void 0;
+exports.LANGUAGES = {
+    en: {
+        empty: 'No changed files exist under the {PATH} path, no packages have been deployed.',
+        error: 'An error occurred during the canary deployment.',
+        failure: 'Please specify the detect version for a valid canary version deployment',
+    },
+    ko: {
+        empty: '{PATH} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.',
+        error: '카나리 배포 도중 에러가 발생했습니다.',
+        failure: '올바른 카나리 버전 배포를 위해 detect version을 명시해주세요',
+    },
+};
+
+
+/***/ }),
+
 /***/ 7630:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -53250,6 +53273,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
 const read_1 = __importDefault(__nccwpck_require__(1746));
+const lang_1 = __nccwpck_require__(5264);
 const fs = __importStar(__nccwpck_require__(77));
 const resolve_from_1 = __importDefault(__nccwpck_require__(1345));
 const apis_1 = __importDefault(__nccwpck_require__(6500));
@@ -53258,6 +53282,11 @@ const file_1 = __nccwpck_require__(398);
 const npm_1 = __nccwpck_require__(6824);
 const publish_1 = __nccwpck_require__(9459);
 const cwd = process.cwd();
+const VERSION_TEMPLATE_CONSTANTS = {
+    version: 'VERSION',
+    date: 'DATE',
+    commitId7: 'COMMITID7',
+};
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -53265,12 +53294,13 @@ function main() {
         yield (0, npm_1.setNpmRc)();
         const { pullFetchers, issueFetchers } = (0, apis_1.default)();
         const pullRequestInfo = yield pullFetchers.getPullRequestInfo();
+        const language = core.getInput('language');
         try {
             // 변경된 사항이 있는지 체크.
             // 변경사항이 있을때만 카나리를 배포 할 수 있다.
             const changesets = yield (0, read_1.default)(cwd);
             if (changesets.length === 0) {
-                yield issueFetchers.addComment('올바른 카나리 버전 배포를 위해 detect version을 명시해주세요');
+                yield issueFetchers.addComment(lang_1.LANGUAGES[language].failure);
                 return;
             }
             const changedFiles = yield (0, utils_1.getChangedAllFiles)({
@@ -53315,14 +53345,35 @@ function main() {
                 }
             }
             fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
+            const versionTemplate = core.getInput('version_template');
             // 변경된 패키지들의 버전을 강제로 치환합니다
             changedPackageInfos.forEach((packageJsonPath) => {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-                const newVersion = `${packageJson.version}-${npmTag}-${pullRequestInfo.head.sha.slice(0, 7)}`;
-                core.info(`✅ [${packageJson.name}] 이전 버전: ${packageJson.version} / 😘 새로운 버전: ${newVersion}`);
+                const today = new Date();
+                const pad = (n) => n.toString().padStart(2, '0');
+                const year2 = today.getFullYear().toString().slice(2);
+                const dateStr = `${year2}${pad(today.getMonth() + 1)}${pad(today.getDate())}`; // YYYYMMDD
+                const commitId7 = pullRequestInfo.head.sha.slice(0, 7);
+                const version = packageJson.version;
+                const replacements = {
+                    [VERSION_TEMPLATE_CONSTANTS.version]: version,
+                    [VERSION_TEMPLATE_CONSTANTS.date]: dateStr,
+                    [VERSION_TEMPLATE_CONSTANTS.commitId7]: commitId7,
+                };
+                const templateConstantsString = Object.values(VERSION_TEMPLATE_CONSTANTS).join('|');
+                const newVersion = versionTemplate.replace(new RegExp(`\\{(${templateConstantsString})\\}`, 'g'), (_, key) => {
+                    var _a;
+                    return (_a = replacements[key]) !== null && _a !== void 0 ? _a : '';
+                });
+                core.info(`✅ [${packageJson.name}] Previous version: ${packageJson.version} / 😘 Next version: ${newVersion}`);
                 packageJson.version = newVersion;
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             });
+            const dryRun = core.getBooleanInput('dry_run');
+            if (dryRun) {
+                core.info('This is dry run for Canary distribution.');
+                return;
+            }
             // 변경된 버전으로 카나리 배포
             const publishScript = core.getInput('publish_script');
             const [publishCommand, ...publishArgs] = publishScript.split(/\s+/);
@@ -53332,7 +53383,10 @@ function main() {
             const { message, publishedPackages } = (0, publish_1.getPublishedPackageInfos)({
                 execOutput: changesetPublishOutput,
                 packagesDir,
+                language,
             });
+            const createRelease = core.getBooleanInput('create_release');
+            createRelease && (yield (0, publish_1.createReleaseForTags)(publishedPackages.map(({ name, version }) => `${name}@${version}`)));
             // 배포 완료 코멘트
             yield issueFetchers.addComment(message);
             // output 설정
@@ -53341,7 +53395,8 @@ function main() {
             core.setOutput('message', message);
         }
         catch (e) {
-            issueFetchers.addComment('카나리 배포 도중 에러가 발생했습니다.');
+            core.error(e === null || e === void 0 ? void 0 : e.message);
+            issueFetchers.addComment(lang_1.LANGUAGES[language].error);
         }
     });
 }
@@ -53435,7 +53490,7 @@ function protectUnchangedPackages(changedPackages) {
         for (const packageJsonPath of allPackageJSON) {
             if (!changedPackages.includes(packageJsonPath)) {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-                core.info(`🔨 [${packageJson.name}] private:true 를 추가합니다`);
+                core.info(`🔨 [${packageJson.name}] Add private:true option.`);
                 packageJson.private = true;
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             }
@@ -53447,7 +53502,7 @@ function removeChangesetMdFiles(_a) {
         const markdownPaths = yield (0, fast_glob_1.default)('.changeset/*.md');
         return Promise.all(markdownPaths.map((markdownPath) => __awaiter(this, void 0, void 0, function* () {
             if (changedFiles.find(({ filename }) => filename === markdownPath) == null) {
-                console.log(`PR과 관련없는 ${markdownPath} 제거`); // eslint-disable-line
+                console.log(`Remove ${markdownPath} unrelated to PR`); // eslint-disable-line
                 yield fs.remove(markdownPath);
             }
         })));
@@ -53528,18 +53583,55 @@ function setNpmRc() {
 /***/ }),
 
 /***/ 9459:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPublishedPackageInfos = getPublishedPackageInfos;
+exports.createReleaseForTags = createReleaseForTags;
+const node_child_process_1 = __nccwpck_require__(7718);
+const core = __importStar(__nccwpck_require__(6108));
+const exec_1 = __nccwpck_require__(9629);
+const lang_1 = __nccwpck_require__(5264);
 const utils_1 = __nccwpck_require__(3927);
-function getPublishedPackageInfos({ packagesDir, execOutput }) {
+function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
     const publishedPackages = [];
     for (const publishOutput of execOutput.stdout.split('\n')) {
         // eslint-disable-next-line no-useless-escape
-        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(\d+\.\d+\.\d+\-[A-Za-z]+\-\w{7})$/;
+        const regExp = /^(🦋 {2})([A-Za-z-\d\/\@]+@)(.+)$/;
         const matchResult = publishOutput.trim().match(regExp);
         if (!matchResult) {
             continue;
@@ -53551,11 +53643,34 @@ function getPublishedPackageInfos({ packagesDir, execOutput }) {
     const copyCodeBlock = uniqPackages.map(({ name, version }) => `${name}@${version}`).join('\n');
     const message = uniqPackages.length > 0
         ? ['## Published Canary Packages', '', '', '```', `${copyCodeBlock}`, '```'].join('\n')
-        : `${packagesDir} 하위 변경된 파일이 없어, 배포된 패키지가 없습니다.`;
+        : lang_1.LANGUAGES[language].empty.replace('{PATH}', packagesDir);
     return {
         message,
         publishedPackages: uniqPackages,
     };
+}
+function createReleaseForTags(tags) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const tag of tags) {
+            // 이미 Release가 생성된 태그는 건너뜀
+            try {
+                yield (0, exec_1.exec)('gh', ['release', 'view', tag]);
+                core.info(`Release already exists for tag: ${tag}`);
+                continue;
+            }
+            catch (_a) {
+                // IGNORE: release가 없으면 진행
+            }
+            // 커밋 로그 추출하여 릴리즈 노트 생성
+            const notes = (0, node_child_process_1.execSync)(`git log ${tag}^..${tag} --pretty=format:"- %s"`, { encoding: 'utf8' });
+            /**
+             * GitHub Release 생성
+             * @see https://cli.github.com/manual/gh_release_create
+             */
+            yield (0, exec_1.exec)('gh', ['release', 'create', tag, '--title', tag, '--notes', notes || 'No changes', '--prerelease']);
+            core.info(`Created Release for tag: ${tag}`);
+        }
+    });
 }
 
 
@@ -54151,6 +54266,14 @@ module.exports = require("module");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 7718:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:child_process");
 
 /***/ }),
 

@@ -1,23 +1,23 @@
-### 이슈 <!-- #뒤에 이슈번호 작성 -->
+### Issue <!-- Write the issue number after # -->
 
 - NaverPayDev/changeset-actions#
 
-### 작업 유형
+### Type of Work
 
-- [ ] 버그 수정
-- [ ] 기능 추가
-- [ ] 코드 개선
+- [ ] Bug Fix
+- [ ] Feature Addition
+- [ ] Code Improvement
 
-### 작업 내용 <!-- PR의 주요 작업 내용 작성 -->
-
--
--
--
-
-### PR 포인트 <!-- 리뷰어 분들이 집중적으로 보셨으면 하는 내용 (참고할 내용) -->
+### Description of Work <!-- Briefly describe the main work done in this PR -->
 
 -
 -
 -
 
-### 기타 <!-- 기타 적고싶은 내용(TODO, 참고링크 등) 기재. 없으면 생략 -->
+### Review Points <!-- Points you want reviewers to focus on (references, details, etc.) -->
+
+-
+-
+-
+
+### Others <!-- Any additional notes (TODOs, reference links, etc.). Omit if not applicable -->
