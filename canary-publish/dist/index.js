@@ -53359,6 +53359,8 @@ function main() {
                 execOutput: changesetPublishOutput,
                 packagesDir,
             });
+            const createRelease = core.getBooleanInput('create_release');
+            createRelease && (yield (0, publish_1.createReleaseForTags)(publishedPackages.map(({ name, version }) => `${name}@${version}`)));
             // 배포 완료 코멘트
             yield issueFetchers.addComment(message);
             // output 설정
@@ -53555,12 +53557,48 @@ function setNpmRc() {
 /***/ }),
 
 /***/ 9459:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPublishedPackageInfos = getPublishedPackageInfos;
+exports.createReleaseForTags = createReleaseForTags;
+const node_child_process_1 = __nccwpck_require__(7718);
+const core = __importStar(__nccwpck_require__(6108));
+const exec_1 = __nccwpck_require__(9629);
 const utils_1 = __nccwpck_require__(3927);
 function getPublishedPackageInfos({ packagesDir, execOutput }) {
     const publishedPackages = [];
@@ -53583,6 +53621,29 @@ function getPublishedPackageInfos({ packagesDir, execOutput }) {
         message,
         publishedPackages: uniqPackages,
     };
+}
+function createReleaseForTags(tags) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const tag of tags) {
+            // 이미 Release가 생성된 태그는 건너뜀
+            try {
+                yield (0, exec_1.exec)('gh', ['release', 'view', tag]);
+                core.info(`Release already exists for tag: ${tag}`);
+                continue;
+            }
+            catch (_a) {
+                // IGNORE: release가 없으면 진행
+            }
+            // 커밋 로그 추출하여 릴리즈 노트 생성
+            const notes = (0, node_child_process_1.execSync)(`git log ${tag}^..${tag} --pretty=format:"- %s"`, { encoding: 'utf8' });
+            /**
+             * GitHub Release 생성
+             * @see https://cli.github.com/manual/gh_release_create
+             */
+            yield (0, exec_1.exec)('gh', ['release', 'create', tag, '--title', tag, '--notes', notes || 'No changes', '--prerelease']);
+            core.info(`Created Release for tag: ${tag}`);
+        }
+    });
 }
 
 
@@ -54178,6 +54239,14 @@ module.exports = require("module");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 7718:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:child_process");
 
 /***/ }),
 

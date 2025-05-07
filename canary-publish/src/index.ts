@@ -9,7 +9,7 @@ import {getChangedAllFiles} from '$actions/utils'
 
 import {getChangedPackages, protectUnchangedPackages, removeChangesetMdFiles} from './utils/file'
 import {setNpmRc} from './utils/npm'
-import {getPublishedPackageInfos} from './utils/publish'
+import {createReleaseForTags, getPublishedPackageInfos} from './utils/publish'
 
 const cwd = process.cwd()
 
@@ -140,6 +140,10 @@ async function main() {
             execOutput: changesetPublishOutput,
             packagesDir,
         })
+
+        const createRelease = core.getBooleanInput('create_release')
+
+        createRelease && (await createReleaseForTags(publishedPackages.map(({name, version}) => `${name}@${version}`)))
 
         // 배포 완료 코멘트
         await issueFetchers.addComment(message)

@@ -33,3 +33,7 @@ inputs:
         description: 'only log packages to canary without publishing'
         required: false
         default: 'false'
+    create_release:
+        description: 'create release with package and version'
+        required: false
+        default: 'false'
