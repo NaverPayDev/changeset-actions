@@ -53401,7 +53401,7 @@ function main() {
         }
         catch (e) {
             core.error(e === null || e === void 0 ? void 0 : e.message);
-            issueFetchers.addComment(lang_1.LANGUAGES[language].error);
+            yield issueFetchers.addComment(lang_1.LANGUAGES[language].error);
             process.exit(1); // close with error
         }
     });

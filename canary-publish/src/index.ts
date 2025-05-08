@@ -164,7 +164,7 @@ async function main() {
         core.setOutput('message', message)
     } catch (e) {
         core.error((e as Error)?.message)
-        issueFetchers.addComment(LANGUAGES[language].error)
+        await issueFetchers.addComment(LANGUAGES[language].error)
         process.exit(1) // close with error
     }
 }
