@@ -53666,7 +53666,15 @@ function getFilteredCommitMessages({ baseSha, headSha }) {
     const shas = (0, node_child_process_1.execSync)(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha}`, { encoding: 'utf8' })
         .split('\n')
         .filter(Boolean);
-    const messages = [];
+    const messages = [
+        '## 🚧 Pre-release',
+        '',
+        `This release is a **pre-release** version.`,
+        'Please make sure to thoroughly test it before deploying to production.',
+        '',
+        '### Changes',
+        '',
+    ];
     for (const sha of shas) {
         // 해당 커밋의 변경 파일 목록 조회
         const files = (0, node_child_process_1.execSync)(`git show --pretty="" --name-only ${sha}`, { encoding: 'utf8' })

@@ -52,7 +52,15 @@ function getFilteredCommitMessages({baseSha, headSha}: {baseSha: string; headSha
         .split('\n')
         .filter(Boolean)
 
-    const messages = []
+    const messages = [
+        '## 🚧 Pre-release',
+        '',
+        `This release is a **pre-release** version.`,
+        'Please make sure to thoroughly test it before deploying to production.',
+        '',
+        '### Changes',
+        '',
+    ]
 
     for (const sha of shas) {
         // 해당 커밋의 변경 파일 목록 조회
