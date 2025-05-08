@@ -50,8 +50,63 @@ jobs:
                   version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (Optional) Template for the canary version string.
                   dry_run: false                                     # (Optional) If true, performs a dry run without publishing.
                   language: 'en'                                     # (Optional) Language for output messages (e.g., en, ko).
-                  create_release: false                              # (Optional) If true, creates a GitHub Release after canary publishing. Make sure to add `fetch-depth: 0` `with` option to @action/checkout.
+                  create_release: false                              # (Optional) If true, creates a GitHub Release after canary publishing.
 ```
+
+### ⚠️ Important Notes for `create_release: true`
+
+When using this action with `create_release: true`, please make sure to:
+
+1. Set `fetch-depth: 0` for `actions/checkout`
+
+    This ensures the full git history is available for generating release notes.
+
+    ```yml
+    - uses: actions/checkout@v4
+      with:
+          fetch-depth: 0
+    ```
+
+2. Set the `GH_TOKEN` environment variable
+
+    The gh CLI requires authentication. Set the token as an environment variable:
+
+    ```yml
+    env:
+        GH_TOKEN: ${{ github.token }}
+    ```
+
+    Or at the job/workflow level.
+
+3. Add `permissions: contents: write` to your workflow
+
+    This is required for creating releases via the GitHub API.
+
+    ```yml
+    permissions:
+        contents: write
+    ```
+
+Example Workflow Snippet
+
+```yml
+permissions:
+  contents: write
+
+jobs:
+  release:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: NaverPayDev/changeset-actions/canary-publish@main
+        with:
+          create_release: true
+```
+
+**If any of these are missing, the release creation step may fail.**
 
 ## Execution Results
 

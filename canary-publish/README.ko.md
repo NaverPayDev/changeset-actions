@@ -50,8 +50,64 @@ jobs:
                   version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (선택) Canary 버전명 템플릿
                   dry_run: false                                     # (선택) true면 실제 배포 없이 시뮬레이션만 수행
                   language: 'en'                                     # (선택) 메시지 언어 설정 (en, ko 등)
-                  create_release: false                              # (선택) true면 Canary 배포 후 GitHub  Release 자동 생성. 반드시 @action/checkout에 `fetch-depth: 0` with 옵션을 주세요.
+                  create_release: false                              # (선택) true면 Canary 배포 후 GitHub  Release 자동 생성
 ```
+
+### ⚠️ `create_release: true` 사용 시 주의사항
+
+이 액션을 `create_release: true` 옵션과 함께 사용할 때는 아래 사항을 반드시 지켜주세요.
+
+1. `actions/checkout`의 `fetch-depth: 0` 설정
+
+    전체 git 히스토리를 받아와야 릴리즈 노트가 정확하게 생성됩니다.
+
+    ```yml
+    - uses: actions/checkout@v4
+      with:
+          fetch-depth: 0
+    ```
+
+2. `GH_TOKEN` 환경 변수 설정
+
+    gh CLI 사용을 위해 인증 토큰이 필요합니다. 아래와 같이 환경 변수로 지정해 주세요.
+
+    ```yml
+    env:
+        GH_TOKEN: ${{ github.token }}
+    ```
+
+    (job 또는 workflow 전체에 지정해도 됩니다.)
+
+3. `permissions: contents: write` 권한 추가
+
+    릴리즈 생성을 위해 해당 권한이 필요합니다.
+
+    ```yml
+    permissions:
+        contents: write
+    ```
+
+예시 워크플로우
+
+```yml
+permissions:
+  contents: write
+
+jobs:
+  release:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: NaverPayDev/changeset-actions/canary-publish@main
+        with:
+          create_release: true
+```
+
+**위 설정이 누락되면 릴리즈 생성이 실패할 수 있습니다. 반드시 확인해 주세요!**
+
 
 ## 실행 결과
 
