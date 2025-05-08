@@ -43,7 +43,15 @@ export function getPublishedPackageInfos({
     }
 }
 
-export async function createReleaseForTags(tags: string[]) {
+export async function createReleaseForTags({
+    tags,
+    baseSha,
+    headSha,
+}: {
+    tags: string[]
+    baseSha: string
+    headSha: string
+}) {
     for (const tag of tags) {
         // 이미 Release가 생성된 태그는 건너뜀
         try {
@@ -55,7 +63,7 @@ export async function createReleaseForTags(tags: string[]) {
         }
 
         // 커밋 로그 추출하여 릴리즈 노트 생성
-        const notes = execSync(`git log ${tag}^..${tag} --pretty=format:"- %s"`, {encoding: 'utf8'})
+        const notes = execSync(`git log ${baseSha}..${headSha} --pretty=format:"- %s"`, {encoding: 'utf8'})
 
         /**
          * GitHub Release 생성

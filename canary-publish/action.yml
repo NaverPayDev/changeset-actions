@@ -34,7 +34,7 @@ inputs:
         required: false
         default: 'false'
     create_release:
-        description: 'create release with package and version'
+        description: 'create release with package and version (If true, you must set `fetch-depth: 0` in @action/checkout)'
         required: false
         default: 'false'
     language:

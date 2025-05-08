@@ -53386,7 +53386,12 @@ function main() {
                 language,
             });
             const createRelease = core.getBooleanInput('create_release');
-            createRelease && (yield (0, publish_1.createReleaseForTags)(publishedPackages.map(({ name, version }) => `${name}@${version}`)));
+            createRelease &&
+                (yield (0, publish_1.createReleaseForTags)({
+                    tags: publishedPackages.map(({ name, version }) => `${name}@${version}`),
+                    baseSha: pullRequestInfo.base.sha,
+                    headSha: pullRequestInfo.head.sha,
+                }));
             // 배포 완료 코멘트
             yield issueFetchers.addComment(message);
             // output 설정
@@ -53397,6 +53402,7 @@ function main() {
         catch (e) {
             core.error(e === null || e === void 0 ? void 0 : e.message);
             issueFetchers.addComment(lang_1.LANGUAGES[language].error);
+            process.exit(1); // close with error
         }
     });
 }
@@ -53652,8 +53658,8 @@ function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
         publishedPackages: uniqPackages,
     };
 }
-function createReleaseForTags(tags) {
-    return __awaiter(this, void 0, void 0, function* () {
+function createReleaseForTags(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ tags, baseSha, headSha, }) {
         for (const tag of tags) {
             // 이미 Release가 생성된 태그는 건너뜀
             try {
@@ -53661,11 +53667,11 @@ function createReleaseForTags(tags) {
                 core.info(`Release already exists for tag: ${tag}`);
                 continue;
             }
-            catch (_a) {
+            catch (_b) {
                 // IGNORE: release가 없으면 진행
             }
             // 커밋 로그 추출하여 릴리즈 노트 생성
-            const notes = (0, node_child_process_1.execSync)(`git log ${tag}^..${tag} --pretty=format:"- %s"`, { encoding: 'utf8' });
+            const notes = (0, node_child_process_1.execSync)(`git log ${baseSha}..${headSha} --pretty=format:"- %s"`, { encoding: 'utf8' });
             /**
              * GitHub Release 생성
              * @see https://cli.github.com/manual/gh_release_create

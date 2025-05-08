@@ -50,7 +50,7 @@ jobs:
                   version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (Optional) Template for the canary version string.
                   dry_run: false                                     # (Optional) If true, performs a dry run without publishing.
                   language: 'en'                                     # (Optional) Language for output messages (e.g., en, ko).
-                  create_release: false                              # (Optional) If true, creates a GitHub Release after canary publishing.
+                  create_release: false                              # (Optional) If true, creates a GitHub Release after canary publishing. Make sure to add `fetch-depth: 0` `with` option to @action/checkout.
 ```
 
 ## Execution Results

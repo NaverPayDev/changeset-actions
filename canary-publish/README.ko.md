@@ -50,7 +50,7 @@ jobs:
                   version_template: '{VERSION}-canary.{DATE}-{COMMITID7}' # (선택) Canary 버전명 템플릿
                   dry_run: false                                     # (선택) true면 실제 배포 없이 시뮬레이션만 수행
                   language: 'en'                                     # (선택) 메시지 언어 설정 (en, ko 등)
-                  create_release: false                              # (선택) true면 Canary 배포 후 GitHub Release 자동 생성   
+                  create_release: false                              # (선택) true면 Canary 배포 후 GitHub  Release 자동 생성. 반드시 @action/checkout에 `fetch-depth: 0` with 옵션을 주세요.
 ```
 
 ## 실행 결과
