@@ -148,7 +148,12 @@ async function main() {
 
         const createRelease = core.getBooleanInput('create_release')
 
-        createRelease && (await createReleaseForTags(publishedPackages.map(({name, version}) => `${name}@${version}`)))
+        createRelease &&
+            (await createReleaseForTags({
+                tags: publishedPackages.map(({name, version}) => `${name}@${version}`),
+                baseSha: pullRequestInfo.base.sha,
+                headSha: pullRequestInfo.head.sha,
+            }))
 
         // 배포 완료 코멘트
         await issueFetchers.addComment(message)
@@ -160,6 +165,7 @@ async function main() {
     } catch (e) {
         core.error((e as Error)?.message)
         issueFetchers.addComment(LANGUAGES[language].error)
+        process.exit(1) // close with error
     }
 }
 
