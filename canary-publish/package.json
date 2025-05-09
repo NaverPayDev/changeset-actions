@@ -12,7 +12,6 @@
         "clean": "rm -rf dist"
     },
     "dependencies": {
-        "@changesets/cli": "^2.20.0",
         "@changesets/read": "^0.6.0",
         "@vercel/ncc": "^0.38.1",
         "fast-glob": "^3.3.2",

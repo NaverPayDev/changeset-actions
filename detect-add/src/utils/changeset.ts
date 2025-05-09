@@ -1,6 +1,9 @@
 import {humanId} from 'human-id'
 
 import {CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM} from '../constants'
+import {getReleasePlanMessage} from './get-release-plan'
+
+import type {ReleasePlan} from '@changesets/types'
 
 type VERSION = 'major' | 'minor' | 'patch'
 
@@ -56,12 +59,14 @@ export function getChangedPackagesGithubComment({
     isKoreanLanguage,
     hasChangesetMarkdownInPullRequest,
     skipLabel,
+    releasePlan,
 }: {
     changedPackages: string[]
     pullRequest: PullRequest
     isKoreanLanguage: boolean
     hasChangesetMarkdownInPullRequest: boolean
     skipLabel?: string
+    releasePlan: ReleasePlan
 }) {
     const commitComment = pullRequest.head?.sha
         ? isKoreanLanguage
@@ -87,6 +92,8 @@ export function getChangedPackagesGithubComment({
 
     const packageNames = changedPackages.join('`, `')
 
+    const releasePlanMessage = getReleasePlanMessage(releasePlan, isKoreanLanguage)
+
     if (isKoreanLanguage) {
         return [
             hasChangesetMarkdownInPullRequest
@@ -102,6 +109,7 @@ export function getChangedPackagesGithubComment({
                 : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
             '',
             ...bumpComment,
+            releasePlanMessage,
             checksumComment,
         ].join('\n')
     }
@@ -117,6 +125,7 @@ export function getChangedPackagesGithubComment({
             : '**If you want to add changes to `.changeset`, please select one of the following options.**',
         '',
         ...bumpComment,
+        releasePlanMessage,
         checksumComment,
     ].join('\n')
 }

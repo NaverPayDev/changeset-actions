@@ -8,6 +8,7 @@ import {commitAll, getChangedAllFiles, getOctokitRestCommonParams, push} from '$
 import {CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM} from './constants'
 import {getChangedPackagesGithubComment, getChangesetEmptyGithubComment} from './utils/changeset'
 import {getChangedPackages} from './utils/file'
+import {getReleasePlan} from './utils/get-release-plan'
 
 async function main() {
     const context = github.context
@@ -127,6 +128,14 @@ async function main() {
         excludes: excludes.split(',') as string[],
     })
 
+    const {releasePlan} = await getReleasePlan({
+        repo,
+        owner,
+        changedFiles: allChangedFiles.map((x) => x.filename),
+        octokit,
+        githubToken,
+    })
+
     // 변경된 패키지가 없다면 Empty 메시지를 남긴다.
     if (changedPackages.length === 0) {
         const emptyCommentContent = getChangesetEmptyGithubComment({isKoreanLanguage, pullRequest: pull_request})
@@ -146,6 +155,7 @@ async function main() {
         isKoreanLanguage,
         hasChangesetMarkdownInPullRequest,
         skipLabel,
+        releasePlan,
     })
     const comment = {...commonParams, body: commentContent}
     if (prevComment !== undefined) {
