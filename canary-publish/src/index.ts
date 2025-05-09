@@ -1,3 +1,5 @@
+import {dirname} from 'node:path'
+
 import * as core from '@actions/core'
 import {exec, getExecOutput} from '@actions/exec'
 import readChangesets from '@changesets/read'
@@ -91,6 +93,8 @@ async function main() {
 
         const versionTemplate = core.getInput('version_template')
 
+        const packagePathByName: Record<string, string> = {}
+
         // 변경된 패키지들의 버전을 강제로 치환합니다
         changedPackageInfos.forEach((packageJsonPath) => {
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
@@ -122,6 +126,8 @@ async function main() {
 
             packageJson.version = newVersion
 
+            packagePathByName[packageJson.name] = dirname(packageJsonPath)
+
             fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8')
         })
 
@@ -150,7 +156,10 @@ async function main() {
 
         createRelease &&
             (await createReleaseForTags({
-                tags: publishedPackages.map(({name, version}) => `${name}@${version}`),
+                packageData: publishedPackages.map(({name, version}) => ({
+                    tag: `${name}@${version}`,
+                    packagePath: packagePathByName[name],
+                })),
                 baseSha: pullRequestInfo.base.sha,
                 headSha: pullRequestInfo.head.sha,
             }))

@@ -46,9 +46,19 @@ export function getPublishedPackageInfos({
 /**
  * changeset 변경 파일 커밋만 제외하고 작업 커밋 로그만 추출
  */
-function getFilteredCommitMessages({baseSha, headSha}: {baseSha: string; headSha: string}) {
+function getFilteredCommitMessages({
+    baseSha,
+    headSha,
+    packagePath,
+}: {
+    baseSha: string
+    headSha: string
+    packagePath: string
+}) {
     // 커밋 해시 목록만 추출
-    const shas = execSync(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha}`, {encoding: 'utf8'})
+    const shas = execSync(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha} -- ${packagePath}`, {
+        encoding: 'utf8',
+    })
         .split('\n')
         .filter(Boolean)
 
@@ -81,15 +91,18 @@ function getFilteredCommitMessages({baseSha, headSha}: {baseSha: string; headSha
 }
 
 export async function createReleaseForTags({
-    tags,
+    packageData,
     baseSha,
     headSha,
 }: {
-    tags: string[]
+    packageData: {
+        tag: string
+        packagePath: string
+    }[]
     baseSha: string
     headSha: string
 }) {
-    for (const tag of tags) {
+    for (const {tag, packagePath} of packageData) {
         // 이미 Release가 생성된 태그는 건너뜀
         try {
             await exec('gh', ['release', 'view', tag])
@@ -100,7 +113,7 @@ export async function createReleaseForTags({
         }
 
         // 커밋 로그 추출하여 릴리즈 노트 생성
-        const notes = getFilteredCommitMessages({baseSha, headSha})
+        const notes = getFilteredCommitMessages({baseSha, headSha, packagePath})
 
         /**
          * GitHub Release 생성
