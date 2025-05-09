@@ -76,13 +76,46 @@ importers:
 
   detect-add:
     dependencies:
+      '@changesets/assemble-release-plan':
+        specifier: github:NaverPayDev/changesets-assemble-release-plan
+        version: https://codeload.github.com/NaverPayDev/changesets-assemble-release-plan/tar.gz/9e012e6f27e5adb43d5f65ad415de4f982743f1f
+      '@changesets/config':
+        specifier: ^3.1.1
+        version: 3.1.1
+      '@changesets/parse':
+        specifier: ^0.4.1
+        version: 0.4.1
+      '@manypkg/get-packages':
+        specifier: ^1.1.3
+        version: 1.1.3
       '@vercel/ncc':
         specifier: ^0.38.1
         version: 0.38.1
       human-id:
         specifier: ^4.0.0
         version: 4.1.1
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
+      markdown-table:
+        specifier: ^3.0.4
+        version: 3.0.4
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
     devDependencies:
+      '@changesets/types':
+        specifier: ^6.1.0
+        version: 6.1.0
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/markdown-table':
+        specifier: ^3.0.0
+        version: 3.0.0
+      '@types/micromatch':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ^20.14.9
         version: 20.16.5
@@ -269,8 +302,19 @@ packages:
     resolution: {integrity: sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==}
     engines: {node: '>=6.9.0'}
 
+  '@changesets/assemble-release-plan@https://codeload.github.com/NaverPayDev/changesets-assemble-release-plan/tar.gz/9e012e6f27e5adb43d5f65ad415de4f982743f1f':
+    resolution: {tarball: https://codeload.github.com/NaverPayDev/changesets-assemble-release-plan/tar.gz/9e012e6f27e5adb43d5f65ad415de4f982743f1f}
+    version: 6.0.6
+    engines: {node: 22.12.0, pnpm: 9.12.3}
+
+  '@changesets/config@3.1.1':
+    resolution: {integrity: sha512-bd+3Ap2TKXxljCggI0mKPfzCQKeV/TU4yO2h2C6vAihIo8tzseAn2e7klSuiyYYXvgu53zMN1OeYMIQkaQoWnA==}
+
   '@changesets/errors@0.2.0':
     resolution: {integrity: sha512-6BLOQUscTpZeGljvyQXlWOItQyU71kCdGz7Pi8H8zdw6BI0g3m43iL4xKUVPWtG+qrrL9DTjpdn8eYuCQSRpow==}
+
+  '@changesets/get-dependents-graph@2.1.3':
+    resolution: {integrity: sha512-gphr+v0mv2I3Oxt19VdWRRUxq3sseyUpX9DaHpTUmLj92Y10AGy+XOtV+kbM6L/fDcpx7/ISDFK6T8A/P3lOdQ==}
 
   '@changesets/git@3.0.1':
     resolution: {integrity: sha512-pdgHcYBLCPcLd82aRcuO0kxCDbw/yISlOtkmwmE8Odo1L6hSiZrBOsRl84eYG7DRCab/iHnOkWqExqc4wxk2LQ==}
@@ -281,14 +325,20 @@ packages:
   '@changesets/parse@0.4.0':
     resolution: {integrity: sha512-TS/9KG2CdGXS27S+QxbZXgr8uPsP4yNJYb4BC2/NeFUj80Rni3TeD2qwWmabymxmrLo7JEsytXH1FbpKTbvivw==}
 
+  '@changesets/parse@0.4.1':
+    resolution: {integrity: sha512-iwksMs5Bf/wUItfcg+OXrEpravm5rEd9Bf4oyIPL4kVTmJQ7PNDSd6MDYkpSJR1pn7tz/k8Zf2DhTCqX08Ou+Q==}
+
   '@changesets/read@0.6.1':
     resolution: {integrity: sha512-jYMbyXQk3nwP25nRzQQGa1nKLY0KfoOV7VLgwucI0bUO8t8ZLCr6LZmgjXsiKuRDc+5A6doKPr9w2d+FEJ55zQ==}
+
+  '@changesets/should-skip-package@0.1.2':
+    resolution: {integrity: sha512-qAK/WrqWLNCP22UDdBTMPH5f41elVDlsNyat180A33dWxuUDyNpg6fPi/FyTZwRriVjg0L8gnjJn2F9XAoF0qw==}
 
   '@changesets/types@4.1.0':
     resolution: {integrity: sha512-LDQvVDv5Kb50ny2s25Fhm3d9QSZimsoUGBsUioj6MC3qbMUCuC8GPIvk/M6IvXx3lYhAs0lwWUQLb+VIEUCECw==}
 
-  '@changesets/types@6.0.0':
-    resolution: {integrity: sha512-b1UkfNulgKoWfqyHtzKS5fOZYSJO+77adgL7DLRDr+/7jhChN+QcHnbjiQVOz/U+Ts3PGNySq7diAItzDgugfQ==}
+  '@changesets/types@6.1.0':
+    resolution: {integrity: sha512-rKQcJ+o1nKNgeoYRHKOS07tAMNd3YSN0uHaJOZYjBAgxfV7TUE7JE+z4BzZdQwb5hKaYbayKN5KrYV7ODb2rAA==}
 
   '@es-joy/jsdoccomment@0.48.0':
     resolution: {integrity: sha512-G6QUWIcC+KvSwXNsJyDTHvqUdNoAVJPPgkc3+Uk4WBKqZvoXhlvazOgm9aL0HwihJLQf0l+tOE2UFzXBqCqgDw==}
@@ -472,8 +522,14 @@ packages:
     resolution: {integrity: sha512-rUV5WyJrJLoloD4NDN1V1+LDMDWOa4OTsT4yYJwQNpTU6FWxkxHpL7eu4w+DmiH8x/EAM1otkPE1+LaspIbplw==}
     engines: {node: '>=18'}
 
+  '@types/braces@3.0.5':
+    resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
+
   '@types/fs-extra@8.1.5':
     resolution: {integrity: sha512-0dzKcwO+S8s2kuF5Z9oUWatQJj5Uq/iqphEtE3GQJVRRYm/tD1LglU2UnXi2A8jLq5umkGouOXOR9y0n613ZwQ==}
+
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -481,8 +537,15 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
+  '@types/markdown-table@3.0.0':
+    resolution: {integrity: sha512-vX5zya26rnLLHdAKA3E9ZOT07CJslYp2gZfAZiXKUY5vd2RRiJyOQKrSlmUjyJ+eNoDAPkHflebG3PsfqC32aA==}
+    deprecated: This is a stub types definition. markdown-table provides its own type definitions, so you do not need this installed.
+
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
+
+  '@types/micromatch@4.0.9':
+    resolution: {integrity: sha512-7V+8ncr22h4UoYRLnLXSpTxjQrNUXtWHGeMPRJt1nULXI57G9bIcpyrHlmrQ7QK24EyyuXvYcSSWAM8GA9nqCg==}
 
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
@@ -1732,6 +1795,9 @@ packages:
   markdown-table@1.1.3:
     resolution: {integrity: sha512-1RUZVgQlpJSPWYbFSpmudq5nHY1doEIv89gBtF0s4gW1GF2XorxcA/70M5vq7rLv0a6mhOUccRsqkwhwLCIQ2Q==}
 
+  markdown-table@3.0.4:
+    resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
   markdownlint-cli2-formatter-default@0.0.4:
     resolution: {integrity: sha512-xm2rM0E+sWgjpPn1EesPXx5hIyrN2ddUnUwnbCsD/ONxYtw3PX6LydvdH6dciWAoFDpwzbHM1TO7uHfcMd6IYg==}
     peerDependencies:
@@ -2683,9 +2749,35 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
+  '@changesets/assemble-release-plan@https://codeload.github.com/NaverPayDev/changesets-assemble-release-plan/tar.gz/9e012e6f27e5adb43d5f65ad415de4f982743f1f':
+    dependencies:
+      '@changesets/errors': 0.2.0
+      '@changesets/get-dependents-graph': 2.1.3
+      '@changesets/should-skip-package': 0.1.2
+      '@changesets/types': 6.1.0
+      '@manypkg/get-packages': 1.1.3
+      semver: 7.6.3
+
+  '@changesets/config@3.1.1':
+    dependencies:
+      '@changesets/errors': 0.2.0
+      '@changesets/get-dependents-graph': 2.1.3
+      '@changesets/logger': 0.1.1
+      '@changesets/types': 6.1.0
+      '@manypkg/get-packages': 1.1.3
+      fs-extra: 7.0.1
+      micromatch: 4.0.8
+
   '@changesets/errors@0.2.0':
     dependencies:
       extendable-error: 0.1.7
+
+  '@changesets/get-dependents-graph@2.1.3':
+    dependencies:
+      '@changesets/types': 6.1.0
+      '@manypkg/get-packages': 1.1.3
+      picocolors: 1.1.0
+      semver: 7.6.3
 
   '@changesets/git@3.0.1':
     dependencies:
@@ -2701,7 +2793,12 @@ snapshots:
 
   '@changesets/parse@0.4.0':
     dependencies:
-      '@changesets/types': 6.0.0
+      '@changesets/types': 6.1.0
+      js-yaml: 3.14.1
+
+  '@changesets/parse@0.4.1':
+    dependencies:
+      '@changesets/types': 6.1.0
       js-yaml: 3.14.1
 
   '@changesets/read@0.6.1':
@@ -2709,14 +2806,19 @@ snapshots:
       '@changesets/git': 3.0.1
       '@changesets/logger': 0.1.1
       '@changesets/parse': 0.4.0
-      '@changesets/types': 6.0.0
+      '@changesets/types': 6.1.0
       fs-extra: 7.0.1
       p-filter: 2.1.0
       picocolors: 1.1.0
 
+  '@changesets/should-skip-package@0.1.2':
+    dependencies:
+      '@changesets/types': 6.1.0
+      '@manypkg/get-packages': 1.1.3
+
   '@changesets/types@4.1.0': {}
 
-  '@changesets/types@6.0.0': {}
+  '@changesets/types@6.1.0': {}
 
   '@es-joy/jsdoccomment@0.48.0':
     dependencies:
@@ -2924,17 +3026,29 @@ snapshots:
 
   '@sindresorhus/merge-streams@1.0.0': {}
 
+  '@types/braces@3.0.5': {}
+
   '@types/fs-extra@8.1.5':
     dependencies:
       '@types/node': 20.16.5
+
+  '@types/js-yaml@4.0.9': {}
 
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
 
+  '@types/markdown-table@3.0.0':
+    dependencies:
+      markdown-table: 3.0.4
+
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
+
+  '@types/micromatch@4.0.9':
+    dependencies:
+      '@types/braces': 3.0.5
 
   '@types/node@12.20.55': {}
 
@@ -4354,6 +4468,8 @@ snapshots:
       uc.micro: 1.0.6
 
   markdown-table@1.1.3: {}
+
+  markdown-table@3.0.4: {}
 
   markdownlint-cli2-formatter-default@0.0.4(markdownlint-cli2@0.11.0):
     dependencies:
