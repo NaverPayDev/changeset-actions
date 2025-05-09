@@ -53270,6 +53270,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const node_path_1 = __nccwpck_require__(9411);
 const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
 const read_1 = __importDefault(__nccwpck_require__(1746));
@@ -53346,6 +53347,7 @@ function main() {
             }
             fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
             const versionTemplate = core.getInput('version_template');
+            const packagePathByName = {};
             // 변경된 패키지들의 버전을 강제로 치환합니다
             changedPackageInfos.forEach((packageJsonPath) => {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
@@ -53367,6 +53369,7 @@ function main() {
                 });
                 core.info(`✅ [${packageJson.name}] Previous version: ${packageJson.version} / 😘 Next version: ${newVersion}`);
                 packageJson.version = newVersion;
+                packagePathByName[packageJson.name] = (0, node_path_1.dirname)(packageJsonPath);
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             });
             const dryRun = core.getBooleanInput('dry_run');
@@ -53388,7 +53391,12 @@ function main() {
             const createRelease = core.getBooleanInput('create_release');
             createRelease &&
                 (yield (0, publish_1.createReleaseForTags)({
-                    tags: publishedPackages.map(({ name, version }) => `${name}@${version}`),
+                    packageData: publishedPackages.map(({ name, version }) => ({
+                        name,
+                        version,
+                        tag: `${name}@${version}`,
+                        packagePath: packagePathByName[name],
+                    })),
                     baseSha: pullRequestInfo.base.sha,
                     headSha: pullRequestInfo.head.sha,
                 }));
@@ -53661,15 +53669,17 @@ function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
 /**
  * changeset 변경 파일 커밋만 제외하고 작업 커밋 로그만 추출
  */
-function getFilteredCommitMessages({ baseSha, headSha }) {
+function getFilteredCommitMessages({ baseSha, headSha, packagePath, packageName, }) {
     // 커밋 해시 목록만 추출
-    const shas = (0, node_child_process_1.execSync)(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha}`, { encoding: 'utf8' })
+    const shas = (0, node_child_process_1.execSync)(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha} -- ${packagePath}`, {
+        encoding: 'utf8',
+    })
         .split('\n')
         .filter(Boolean);
     const messages = [
         '## 🚧 Pre-release',
         '',
-        `This release is a **pre-release** version.`,
+        `This release is a **pre-release** version of ${packageName}.`,
         'Please make sure to thoroughly test it before deploying to production.',
         '',
         '### Changes',
@@ -53690,8 +53700,8 @@ function getFilteredCommitMessages({ baseSha, headSha }) {
     return messages.join('\n');
 }
 function createReleaseForTags(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ tags, baseSha, headSha, }) {
-        for (const tag of tags) {
+    return __awaiter(this, arguments, void 0, function* ({ packageData, baseSha, headSha, }) {
+        for (const { tag, packagePath, name } of packageData) {
             // 이미 Release가 생성된 태그는 건너뜀
             try {
                 yield (0, exec_1.exec)('gh', ['release', 'view', tag]);
@@ -53702,7 +53712,7 @@ function createReleaseForTags(_a) {
                 // IGNORE: release가 없으면 진행
             }
             // 커밋 로그 추출하여 릴리즈 노트 생성
-            const notes = getFilteredCommitMessages({ baseSha, headSha });
+            const notes = getFilteredCommitMessages({ baseSha, headSha, packagePath, packageName: name });
             /**
              * GitHub Release 생성
              * @see https://cli.github.com/manual/gh_release_create
@@ -54322,6 +54332,14 @@ module.exports = require("node:child_process");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
