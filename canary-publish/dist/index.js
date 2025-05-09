@@ -53392,6 +53392,8 @@ function main() {
             createRelease &&
                 (yield (0, publish_1.createReleaseForTags)({
                     packageData: publishedPackages.map(({ name, version }) => ({
+                        name,
+                        version,
                         tag: `${name}@${version}`,
                         packagePath: packagePathByName[name],
                     })),
@@ -53667,7 +53669,7 @@ function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
 /**
  * changeset 변경 파일 커밋만 제외하고 작업 커밋 로그만 추출
  */
-function getFilteredCommitMessages({ baseSha, headSha, packagePath, }) {
+function getFilteredCommitMessages({ baseSha, headSha, packagePath, packageName, }) {
     // 커밋 해시 목록만 추출
     const shas = (0, node_child_process_1.execSync)(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha} -- ${packagePath}`, {
         encoding: 'utf8',
@@ -53677,7 +53679,7 @@ function getFilteredCommitMessages({ baseSha, headSha, packagePath, }) {
     const messages = [
         '## 🚧 Pre-release',
         '',
-        `This release is a **pre-release** version.`,
+        `This release is a **pre-release** version of ${packageName}.`,
         'Please make sure to thoroughly test it before deploying to production.',
         '',
         '### Changes',
@@ -53699,7 +53701,7 @@ function getFilteredCommitMessages({ baseSha, headSha, packagePath, }) {
 }
 function createReleaseForTags(_a) {
     return __awaiter(this, arguments, void 0, function* ({ packageData, baseSha, headSha, }) {
-        for (const { tag, packagePath } of packageData) {
+        for (const { tag, packagePath, name } of packageData) {
             // 이미 Release가 생성된 태그는 건너뜀
             try {
                 yield (0, exec_1.exec)('gh', ['release', 'view', tag]);
@@ -53710,7 +53712,7 @@ function createReleaseForTags(_a) {
                 // IGNORE: release가 없으면 진행
             }
             // 커밋 로그 추출하여 릴리즈 노트 생성
-            const notes = getFilteredCommitMessages({ baseSha, headSha, packagePath });
+            const notes = getFilteredCommitMessages({ baseSha, headSha, packagePath, packageName: name });
             /**
              * GitHub Release 생성
              * @see https://cli.github.com/manual/gh_release_create

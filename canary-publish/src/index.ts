@@ -157,6 +157,8 @@ async function main() {
         createRelease &&
             (await createReleaseForTags({
                 packageData: publishedPackages.map(({name, version}) => ({
+                    name,
+                    version,
                     tag: `${name}@${version}`,
                     packagePath: packagePathByName[name],
                 })),

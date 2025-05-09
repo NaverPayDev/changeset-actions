@@ -50,10 +50,12 @@ function getFilteredCommitMessages({
     baseSha,
     headSha,
     packagePath,
+    packageName,
 }: {
     baseSha: string
     headSha: string
     packagePath: string
+    packageName: string
 }) {
     // 커밋 해시 목록만 추출
     const shas = execSync(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha} -- ${packagePath}`, {
@@ -65,7 +67,7 @@ function getFilteredCommitMessages({
     const messages = [
         '## 🚧 Pre-release',
         '',
-        `This release is a **pre-release** version.`,
+        `This release is a **pre-release** version of ${packageName}.`,
         'Please make sure to thoroughly test it before deploying to production.',
         '',
         '### Changes',
@@ -96,13 +98,15 @@ export async function createReleaseForTags({
     headSha,
 }: {
     packageData: {
+        name: string
+        version: string
         tag: string
         packagePath: string
     }[]
     baseSha: string
     headSha: string
 }) {
-    for (const {tag, packagePath} of packageData) {
+    for (const {tag, packagePath, name} of packageData) {
         // 이미 Release가 생성된 태그는 건너뜀
         try {
             await exec('gh', ['release', 'view', tag])
@@ -113,7 +117,7 @@ export async function createReleaseForTags({
         }
 
         // 커밋 로그 추출하여 릴리즈 노트 생성
-        const notes = getFilteredCommitMessages({baseSha, headSha, packagePath})
+        const notes = getFilteredCommitMessages({baseSha, headSha, packagePath, packageName: name})
 
         /**
          * GitHub Release 생성
