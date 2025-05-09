@@ -53401,7 +53401,7 @@ function main() {
         }
         catch (e) {
             core.error(e === null || e === void 0 ? void 0 : e.message);
-            issueFetchers.addComment(lang_1.LANGUAGES[language].error);
+            yield issueFetchers.addComment(lang_1.LANGUAGES[language].error);
             process.exit(1); // close with error
         }
     });
@@ -53658,6 +53658,37 @@ function getPublishedPackageInfos({ packagesDir, execOutput, language, }) {
         publishedPackages: uniqPackages,
     };
 }
+/**
+ * changeset 변경 파일 커밋만 제외하고 작업 커밋 로그만 추출
+ */
+function getFilteredCommitMessages({ baseSha, headSha }) {
+    // 커밋 해시 목록만 추출
+    const shas = (0, node_child_process_1.execSync)(`git log --reverse --pretty=format:"%H" ${baseSha}..${headSha}`, { encoding: 'utf8' })
+        .split('\n')
+        .filter(Boolean);
+    const messages = [
+        '## 🚧 Pre-release',
+        '',
+        `This release is a **pre-release** version.`,
+        'Please make sure to thoroughly test it before deploying to production.',
+        '',
+        '### Changes',
+        '',
+    ];
+    for (const sha of shas) {
+        // 해당 커밋의 변경 파일 목록 조회
+        const files = (0, node_child_process_1.execSync)(`git show --pretty="" --name-only ${sha}`, { encoding: 'utf8' })
+            .split('\n')
+            .filter(Boolean);
+        // .changeset/*.md 외에 변경된 파일이 하나라도 있으면 커밋 메시지에 추가
+        const hasNonChangesetFile = files.some((file) => !/\.changeset\/.*\.md$/.test(file));
+        if (hasNonChangesetFile) {
+            const msg = (0, node_child_process_1.execSync)(`git log -1 --pretty=format:"- %s" ${sha}`, { encoding: 'utf8' });
+            messages.push(msg);
+        }
+    }
+    return messages.join('\n');
+}
 function createReleaseForTags(_a) {
     return __awaiter(this, arguments, void 0, function* ({ tags, baseSha, headSha, }) {
         for (const tag of tags) {
@@ -53671,7 +53702,7 @@ function createReleaseForTags(_a) {
                 // IGNORE: release가 없으면 진행
             }
             // 커밋 로그 추출하여 릴리즈 노트 생성
-            const notes = (0, node_child_process_1.execSync)(`git log ${baseSha}..${headSha} --pretty=format:"- %s"`, { encoding: 'utf8' });
+            const notes = getFilteredCommitMessages({ baseSha, headSha });
             /**
              * GitHub Release 생성
              * @see https://cli.github.com/manual/gh_release_create
