@@ -116,6 +116,25 @@ export async function createReleaseForTags({
             // IGNORE: release가 없으면 진행
         }
 
+        // 원하는 SHA에 태그가 이미 있는지 확인
+        let tagExists = false
+        try {
+            // git rev-parse <tag>가 성공하면 이미 태그가 있음
+            await exec('git', ['rev-parse', tag])
+            tagExists = true
+        } catch {
+            tagExists = false
+        }
+
+        // 태그가 없다면 원하는 SHA에 태그 생성 및 push
+        if (!tagExists) {
+            await exec('git', ['tag', tag, headSha])
+            await exec('git', ['push', 'origin', tag])
+            core.info(`Created and pushed tag ${tag} at ${headSha}`)
+        } else {
+            core.info(`Tag ${tag} already exists`)
+        }
+
         // 커밋 로그 추출하여 릴리즈 노트 생성
         const notes = getFilteredCommitMessages({baseSha, headSha, packagePath, packageName: name})
 
@@ -123,7 +142,7 @@ export async function createReleaseForTags({
          * GitHub Release 생성
          * @see https://cli.github.com/manual/gh_release_create
          */
-        await exec('gh', ['release', 'create', tag, '--title', tag, '--notes', notes || 'No changes', '--prerelease'])
+        await exec('gh', ['release', 'create', tag, '--title', tag, '--notes', notes, '--prerelease'])
         core.info(`Created Release for tag: ${tag}`)
     }
 }
