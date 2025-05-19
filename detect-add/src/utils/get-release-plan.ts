@@ -42,8 +42,8 @@ export const getReleasePlan = async ({
 
     function fetchFile(path: string) {
         // eslint-disable-next-line no-console
-        console.log(`fetchlink: `, `https://github.com/raw/${owner}/${repo}/${ref}/${path}`)
-        return fetch(`https://github.com/raw/${owner}/${repo}/${ref}/${path}`, {
+        console.log(`fetchlink: `, `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`)
+        return fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`, {
             headers: {
                 Authorization: `Basic ${encodedCredentials}`,
             },
