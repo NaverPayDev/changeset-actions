@@ -57800,7 +57800,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
     if (hasErrored) {
         throw new Error('an error occurred when fetching files');
     }
-    const releasePlan = (0, assemble_release_plan_1.default)(yield Promise.all(changesetPromises), packages, yield configPromise.then((rawConfig) => (0, config_1.parse)(rawConfig, packages)), yield preStatePromise);
+    const releasePlan = (0, assemble_release_plan_1)(yield Promise.all(changesetPromises), packages, yield configPromise.then((rawConfig) => (0, config_1.parse)(rawConfig, packages)), yield preStatePromise);
     return {
         changedPackages: (packages.tool === 'root'
             ? packages.packages
