@@ -57791,7 +57791,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
         if (!Array.isArray(tool.globs) || !tool.globs.every((x) => typeof x === 'string')) {
             throw new Error('globs are not valid: ' + JSON.stringify(tool.globs));
         }
-        const matches = (0, micromatch_1.default)(potentialWorkspaceDirectories, tool.globs);
+        const matches = (0, micromatch_1)(potentialWorkspaceDirectories, tool.globs);
         packages.packages = yield Promise.all(matches.map((dir) => getPackage(dir)));
     }
     else {
