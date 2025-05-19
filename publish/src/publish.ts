@@ -104,7 +104,7 @@ export async function runPublish({publishScript, createGithubReleaseTag}: Publis
     const message = uniqBy(publishedPackages, ({name}) => name)
         .map(
             ({name, version}) =>
-                `- ${name}@${version}\nhttps://oss.fin.navercorp.com/${owner}/${repo}/releases/tag/${name}@${version}`,
+                `- ${name}@${version}\nhttps://github.com/${owner}/${repo}/releases/tag/${name}@${version}`,
         )
         .join('\n')
 

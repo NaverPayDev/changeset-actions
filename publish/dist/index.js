@@ -64149,7 +64149,7 @@ function runPublish(_a) {
             version: pkg.packageJson.version,
         }));
         const message = (0, utils_1.uniqBy)(publishedPackages, ({ name }) => name)
-            .map(({ name, version }) => `- ${name}@${version}\nhttps://oss.fin.navercorp.com/${owner}/${repo}/releases/tag/${name}@${version}`)
+            .map(({ name, version }) => `- ${name}@${version}\nhttps://github.com/${owner}/${repo}/releases/tag/${name}@${version}`)
             .join('\n');
         if (releasedPackages.length) {
             return {
