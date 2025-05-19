@@ -41,6 +41,8 @@ export const getReleasePlan = async ({
     const encodedCredentials = Buffer.from(`x-access-token:${githubToken}`).toString('base64')
 
     function fetchFile(path: string) {
+        // eslint-disable-next-line no-console
+        console.log(`fetchlink: `, `https://github.com/raw/${owner}/${repo}/${ref}/${path}`)
         return fetch(`https://github.com/raw/${owner}/${repo}/${ref}/${path}`, {
             headers: {
                 Authorization: `Basic ${encodedCredentials}`,
