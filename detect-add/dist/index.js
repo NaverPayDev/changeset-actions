@@ -57742,6 +57742,10 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
     }
     const workspaceText = yield fetchTextFile('pnpm-workspace.yaml');
     const workspaceYaml = yaml.load(workspaceText);
+    // eslint-disable-next-line no-console
+    console.log('workspaceYaml', workspaceYaml);
+    // eslint-disable-next-line no-console
+    console.log('workspaceYaml.packages', workspaceYaml.packages);
     let tool;
     if (isPnpm) {
         tool = {

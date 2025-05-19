@@ -127,6 +127,11 @@ export const getReleasePlan = async ({
         packages: string[]
     }
 
+    // eslint-disable-next-line no-console
+    console.log('workspaceYaml', workspaceYaml)
+    // eslint-disable-next-line no-console
+    console.log('workspaceYaml.packages', workspaceYaml.packages)
+
     let tool:
         | {
               tool: Tool
