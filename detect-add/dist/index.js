@@ -57716,7 +57716,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
             continue;
         }
         if (item.path.endsWith('/package.json')) {
-            const dirPath = path_1.default.dirname(item.path);
+            const dirPath = (0, path_1.dirname)(item.path);
             potentialWorkspaceDirectories.push(dirPath);
         }
         else if (item.path === 'pnpm-workspace.yaml') {
@@ -57816,13 +57816,13 @@ const getReleasePlanMessage = (releasePlan, isKoreanLanguage) => {
         ? '이 PR은 어떤 변경사항도 포함하지 않습니다.'
         : 'This PR includes no changesets';
     return `<details><summary>${releasePlan.changesets.length ? detailTitleMessage : emptyMessage}</summary>
-  
+
 ${publishableReleases.length
         ? table
         : isKoreanLanguage
             ? `변경사항이 PR에 추가되면 이 PR에 포함된 패키지와 관련된 semver 유형을 확인할 수 있습니다.`
             : "When changesets are added to this PR, you'll see the packages that this PR includes changesets for and the associated semver types"}
-  
+
   </details>`;
 };
 exports.getReleasePlanMessage = getReleasePlanMessage;

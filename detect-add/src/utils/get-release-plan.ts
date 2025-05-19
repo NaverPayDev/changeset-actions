@@ -1,4 +1,4 @@
-import nodePath from 'path'
+import {dirname} from 'path'
 
 import * as core from '@actions/core'
 import * as github from '@actions/github'
@@ -96,7 +96,7 @@ export const getReleasePlan = async ({
             continue
         }
         if (item.path.endsWith('/package.json')) {
-            const dirPath = nodePath.dirname(item.path)
+            const dirPath = dirname(item.path)
             potentialWorkspaceDirectories.push(dirPath)
         } else if (item.path === 'pnpm-workspace.yaml') {
             isPnpm = true
@@ -227,7 +227,7 @@ export const getReleasePlanMessage = (releasePlan: ReleasePlan | null, isKoreanL
         : 'This PR includes no changesets'
 
     return `<details><summary>${releasePlan.changesets.length ? detailTitleMessage : emptyMessage}</summary>
-  
+
 ${
     publishableReleases.length
         ? table
@@ -235,7 +235,7 @@ ${
         ? `변경사항이 PR에 추가되면 이 PR에 포함된 패키지와 관련된 semver 유형을 확인할 수 있습니다.`
         : "When changesets are added to this PR, you'll see the packages that this PR includes changesets for and the associated semver types"
 }
-  
+
   </details>`
 }
 
