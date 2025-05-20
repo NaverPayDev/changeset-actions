@@ -57294,6 +57294,29 @@ exports.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM = 'naverpay changeset detect-add a
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -57305,9 +57328,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* eslint-disable @typescript-eslint/naming-convention */
-const core = __nccwpck_require__(6108);
+const core = __importStar(__nccwpck_require__(6108));
 const exec_1 = __nccwpck_require__(9629);
-const github = __nccwpck_require__(1645);
+const github = __importStar(__nccwpck_require__(1645));
 const utils_1 = __nccwpck_require__(3927);
 const constants_1 = __nccwpck_require__(9562);
 const changeset_1 = __nccwpck_require__(6621);
@@ -57587,6 +57610,29 @@ function getChangesetEmptyGithubComment({ isKoreanLanguage, pullRequest, }) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -57598,7 +57644,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedPackages = getChangedPackages;
-const fs = __nccwpck_require__(77);
+const fs = __importStar(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedPackages(_a) {
     return __awaiter(this, arguments, void 0, function* ({ packagesDir, changedFiles, excludes, }) {
@@ -57637,6 +57683,29 @@ function getChangedPackages(_a) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -57646,17 +57715,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getReleasePlanMessage = exports.getReleasePlan = void 0;
-const path_1 = __nccwpck_require__(1017);
-const core = __nccwpck_require__(6108);
-const github = __nccwpck_require__(1645);
-const assemble_release_plan_1 = __nccwpck_require__(2094);
+const node_path_1 = __nccwpck_require__(9411);
+const core = __importStar(__nccwpck_require__(6108));
+const github = __importStar(__nccwpck_require__(1645));
+const assemble_release_plan_1 = __importDefault(__nccwpck_require__(2094));
 const config_1 = __nccwpck_require__(6867);
-const parse_1 = __nccwpck_require__(7469);
-const yaml = __nccwpck_require__(5005);
+const parse_1 = __importDefault(__nccwpck_require__(7469));
+const yaml = __importStar(__nccwpck_require__(5005));
 const markdown_table_1 = __nccwpck_require__(4262);
-const micromatch_1 = __nccwpck_require__(4230);
+const micromatch_1 = __importDefault(__nccwpck_require__(4230));
 const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owner, repo, changedFiles, octokit, githubToken, }) {
     var _b;
     if (!((_b = github.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head.ref)) {
@@ -57718,7 +57790,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
             continue;
         }
         if (item.path.endsWith('/package.json')) {
-            const dirPath = (0, path_1.dirname)(item.path);
+            const dirPath = (0, node_path_1.dirname)(item.path);
             potentialWorkspaceDirectories.push(dirPath);
         }
         else if (item.path === 'pnpm-workspace.yaml') {
@@ -57791,7 +57863,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
         if (!Array.isArray(tool.globs) || !tool.globs.every((x) => typeof x === 'string')) {
             throw new Error('globs are not valid: ' + JSON.stringify(tool.globs));
         }
-        const matches = (0, micromatch_1)(potentialWorkspaceDirectories, tool.globs);
+        const matches = (0, micromatch_1.default)(potentialWorkspaceDirectories, tool.globs);
         packages.packages = yield Promise.all(matches.map((dir) => getPackage(dir)));
     }
     else {
@@ -57800,7 +57872,7 @@ const getReleasePlan = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owne
     if (hasErrored) {
         throw new Error('an error occurred when fetching files');
     }
-    const releasePlan = (0, assemble_release_plan_1)(yield Promise.all(changesetPromises), packages, yield configPromise.then((rawConfig) => (0, config_1.parse)(rawConfig, packages)), yield preStatePromise);
+    const releasePlan = (0, assemble_release_plan_1.default)(yield Promise.all(changesetPromises), packages, yield configPromise.then((rawConfig) => (0, config_1.parse)(rawConfig, packages)), yield preStatePromise);
     return {
         changedPackages: (packages.tool === 'root'
             ? packages.packages
@@ -57867,6 +57939,29 @@ function formatReleaseTable(publishableReleases, isKoreanLanguage) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -57886,10 +57981,10 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedAllFiles = getChangedAllFiles;
 exports.findNearestPackageJson = findNearestPackageJson;
-const path = __nccwpck_require__(1017);
-const core = __nccwpck_require__(6108);
-const github = __nccwpck_require__(1645);
-const fs = __nccwpck_require__(77);
+const path = __importStar(__nccwpck_require__(1017));
+const core = __importStar(__nccwpck_require__(6108));
+const github = __importStar(__nccwpck_require__(1645));
+const fs = __importStar(__nccwpck_require__(77));
 const utils_1 = __nccwpck_require__(3927);
 function getChangedAllFiles(_a) {
     return __awaiter(this, arguments, void 0, function* ({ pullNumber }) {
@@ -58013,12 +58108,24 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getOctokitRestCommonParams = void 0;
-const github = __nccwpck_require__(1645);
+const github = __importStar(__nccwpck_require__(1645));
 const getOctokitRestCommonParams = () => {
     const { repo: { owner, repo }, ref, } = github.context;
     return { owner, repo, ref };
@@ -58172,6 +58279,14 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
