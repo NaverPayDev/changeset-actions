@@ -64370,31 +64370,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setNpmRc = setNpmRc;
 const core = __importStar(__nccwpck_require__(6108));
-const fs = __importStar(__nccwpck_require__(20077));
 function setNpmRc() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('No changesets found, attempting to publish any unpublished packages to npm');
-        const npmToken = core.getInput('npm_token');
-        const userNpmrcPath = `${process.env.HOME}/.npmrc`;
-        if (fs.existsSync(userNpmrcPath)) {
-            core.info('Found existing user .npmrc file');
-            const userNpmrcContent = yield fs.readFile(userNpmrcPath, 'utf8');
-            const authLine = userNpmrcContent.split('\n').find((line) => {
-                // check based on https://github.com/npm/cli/blob/8f8f71e4dd5ee66b3b17888faad5a7bf6c657eed/test/lib/adduser.js#L103-L105
-                return /^\s*\/\/registry\.npmjs\.org\/:[_-]authToken=/i.test(line);
-            });
-            if (authLine) {
-                core.info('Found existing auth token for the npm registry in the user .npmrc file');
-            }
-            else {
-                core.info("Didn't find existing auth token for the npm registry in the user .npmrc file, creating one");
-                fs.appendFileSync(userNpmrcPath, `\n//registry.npmjs.org/:_authToken=${npmToken}\n`);
-            }
-        }
-        else {
-            core.info('No user .npmrc file found, creating one');
-            fs.writeFileSync(userNpmrcPath, `//registry.npmjs.org/:_authToken=${npmToken}\n`);
-        }
+        core.info('Using OIDC trusted publishing for npm authentication');
+        core.info('Ensure npm CLI 11.5.1+ is installed and id-token: write permission is set');
     });
 }
 

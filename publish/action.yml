@@ -7,9 +7,6 @@ inputs:
     github_token:
         description: 'github token to use for the action'
         required: true
-    npm_token:
-        description: 'npm publish token'
-        required: true
     publish_script:
         description: '배포 script'
         required: false
@@ -36,3 +33,7 @@ inputs:
     formatting_script:
         description: 'add a formatting script when needing to format the .changeset/*.md files'
         required: false
+    provenance:
+        description: 'Enable provenance statements (requires npm CLI 11.5.1+, uses OIDC if available)'
+        required: false
+        default: 'true'

@@ -43,7 +43,6 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}           # (필수) GitHub API 인증 토큰. 필요시 사용자 PAT로 대체 가능
                   npm_tag: canary                                    # (선택) 배포에 사용할 npm 태그 (예: canary, beta 등)
-                  npm_token: ${{ secrets.NPM_TOKEN }}                # (필수) npm publish를 위한 인증 토큰
                   publish_script: pnpm run deploy:canary             # (필수) Canary 배포를 실행할 스크립트 명령어
                   packages_dir: packages                             # (선택) 변경 감지에 사용할 패키지 디렉터리 (기본값: packages,share)
                   excludes: ".turbo,.github"                         # (선택) 변경 감지에서 제외할 파일/디렉터리 목록 (쉼표로 구분)
@@ -51,6 +50,7 @@ jobs:
                   dry_run: false                                     # (선택) true면 실제 배포 없이 시뮬레이션만 수행
                   language: 'en'                                     # (선택) 메시지 언어 설정 (en, ko 등)
                   create_release: false                              # (선택) true면 Canary 배포 후 GitHub  Release 자동 생성
+                  provenance: true                                   # (선택) provenance 생성 활성화 (npm CLI 11.5.1+ 필요)
 ```
 
 ### ⚠️ `create_release: true` 사용 시 주의사항
@@ -107,6 +107,89 @@ jobs:
 ```
 
 **위 설정이 누락되면 릴리즈 생성이 실패할 수 있습니다. 반드시 확인해 주세요!**
+
+## NPM OIDC 신뢰할 수 있는 게시
+
+이 액션은 NPM의 OIDC 기반 신뢰할 수 있는 게시를 사용합니다. NPM 토큰을 시크릿으로 저장할 필요가 없으며, 워크플로우별 단기 자격 증명을 사용하여 더 나은 보안을 제공합니다.
+
+### 사전 요구사항
+
+1. **NPM CLI 버전**: npm CLI v11.5.1 이상 필요
+2. **GitHub Actions 러너**: GitHub 호스트 러너 사용 필수
+3. **NPM 패키지 설정**: npmjs.com에서 신뢰할 수 있는 게시자 설정 필요
+
+### 설정 방법
+
+1. **npmjs.com에서 신뢰할 수 있는 게시자 설정**:
+   - npmjs.com에서 패키지 설정으로 이동
+   - "Publishing access" → "Trusted publishers"로 이동
+   - 다음 정보로 새 신뢰할 수 있는 게시자 추가:
+     - Organization/User: GitHub 조직 또는 사용자 이름
+     - Repository: 저장소 이름
+     - Workflow filename: 워크플로우 파일 이름 (예: `canary-publish.yml`)
+     - Environment name: (선택) GitHub 환경을 사용하는 경우
+
+2. **워크플로우 업데이트**:
+   - `id-token: write` 권한 추가
+   - `npm_token` 입력 제거 (또는 비워두기)
+   - npm CLI 버전이 11.5.1+ 인지 확인
+
+OIDC를 사용하는 워크플로우 예시:
+
+```yaml
+name: changeset canary publish
+
+on:
+    issue_comment:
+        types:
+            - created
+
+permissions:
+    id-token: write      # OIDC에 필수
+    contents: write      # 릴리즈 생성에 필수
+    pull-requests: write # PR 코멘트에 필수
+
+jobs:
+    canary:
+        if: ${{ github.event.issue.pull_request && (github.event.comment.body == 'canary-publish' || github.event.comment.body == '/canary-publish')}}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get PR branch name
+              id: get_branch
+              run: |
+                PR=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }})
+                echo "::set-output name=branch::$(echo $PR | jq -r '.head.ref')"
+
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+              with:
+                ref: ${{ steps.get_branch.outputs.branch }}
+
+            - name: Setup Node with latest npm
+              uses: actions/setup-node@v4
+              with:
+                node-version: '20'
+                registry-url: 'https://registry.npmjs.org'
+
+            - name: Install Dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Canary Publish
+              uses: NaverPayDev/changeset-actions/canary-publish@main
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  npm_tag: canary
+                  publish_script: pnpm run deploy:canary
+                  packages_dir: packages
+                  provenance: true
+```
+
+### OIDC의 장점
+
+- NPM 토큰을 생성, 저장, 갱신할 필요 없음
+- 자동 provenance 증명
+- 토큰 유출 위험 감소
+- 더 나은 감사 추적
 
 ## 실행 결과
 
