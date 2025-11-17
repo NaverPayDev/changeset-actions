@@ -29,7 +29,6 @@ jobs:
             - uses: NaverPayDev/changeset-actions/actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # Add user PAT if necessary
-                  npm_token: ${{ secrets.NPM_TOKEN }} # (Optional) Token required for npm publishing. Not required if using OIDC.
                   publish_script: pnpm run deploy # Script to execute the deployment
                   git_username: npay-fe-bot # GitHub username for version bump PR creation
                   git_email: npay.fe.bot@navercorp.com # GitHub email for version bump PR creation
@@ -40,9 +39,9 @@ jobs:
                   provenance: true # (Optional) Enable provenance statements (requires npm CLI 11.5.1+)
 ```
 
-## Using NPM OIDC Trusted Publishing (Recommended)
+## NPM OIDC Trusted Publishing
 
-NPM now supports OIDC-based trusted publishing, which eliminates the need for storing NPM tokens as secrets. This provides better security by using short-lived, workflow-specific credentials.
+This action uses NPM's OIDC-based trusted publishing, which eliminates the need for storing NPM tokens as secrets. This provides better security by using short-lived, workflow-specific credentials.
 
 ### Prerequisites
 
@@ -100,7 +99,6 @@ jobs:
             - uses: NaverPayDev/changeset-actions/actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  # npm_token is not required when using OIDC
                   publish_script: pnpm run deploy
                   git_username: npay-fe-bot
                   git_email: npay.fe.bot@navercorp.com

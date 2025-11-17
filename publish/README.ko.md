@@ -30,7 +30,6 @@ jobs:
             - uses: NaverPayDev/changeset-actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }} # 필요하면 user의 PAT을 넣어주세요.
-                  npm_token: ${{ secrets.NPM_TOKEN }} # (선택) npm 배포시 필요한 publish token. OIDC 사용 시 불필요
                   publish_script: pnpm run deploy # 배포 실행 script 를 넣어주세요
                   git_username: npay-fe-bot # 버전업 pr 생성시 설정할 github username 을 넣어주세요
                   git_email: npay.fe.bot@navercorp.com # 버전업 pr 생성시 설정할 github email 을 넣어주세요
@@ -41,9 +40,9 @@ jobs:
                   provenance: true # (선택) provenance 생성 활성화 (npm CLI 11.5.1+ 필요)
 ```
 
-## NPM OIDC 신뢰할 수 있는 게시 사용하기 (권장)
+## NPM OIDC 신뢰할 수 있는 게시
 
-NPM은 이제 OIDC 기반 신뢰할 수 있는 게시를 지원하여, NPM 토큰을 시크릿으로 저장할 필요가 없습니다. 워크플로우별 단기 자격 증명을 사용하여 더 나은 보안을 제공합니다.
+이 액션은 NPM의 OIDC 기반 신뢰할 수 있는 게시를 사용합니다. NPM 토큰을 시크릿으로 저장할 필요가 없으며, 워크플로우별 단기 자격 증명을 사용하여 더 나은 보안을 제공합니다.
 
 ### 사전 요구사항
 
@@ -101,7 +100,6 @@ jobs:
             - uses: NaverPayDev/changeset-actions/publish@main
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  # OIDC 사용 시 npm_token 불필요
                   publish_script: pnpm run deploy
                   git_username: npay-fe-bot
                   git_email: npay.fe.bot@navercorp.com

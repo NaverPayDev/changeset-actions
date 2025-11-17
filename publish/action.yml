@@ -7,9 +7,6 @@ inputs:
     github_token:
         description: 'github token to use for the action'
         required: true
-    npm_token:
-        description: 'npm publish token (optional if using OIDC trusted publishing)'
-        required: false
     publish_script:
         description: '배포 script'
         required: false

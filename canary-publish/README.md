@@ -43,7 +43,6 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}           # (Required) GitHub API token for authentication. Use a user PAT if necessary.
                   npm_tag: canary                                    # (Optional) The npm tag to use for deployment (e.g., canary, beta).
-                  npm_token: ${{ secrets.NPM_TOKEN }}                # (Optional) Token used for npm publishing. Not required if using OIDC.
                   publish_script: pnpm run deploy:canary             # (Required) Script command to execute the canary deployment.
                   packages_dir: packages                             # (Optional) Directory containing packages to check for changes (default: packages,share).
                   excludes: ".turbo,.github"                         # (Optional) Files or directories to exclude from change detection (comma-separated).
@@ -109,9 +108,9 @@ jobs:
 
 **If any of these are missing, the release creation step may fail.**
 
-## Using NPM OIDC Trusted Publishing (Recommended)
+## NPM OIDC Trusted Publishing
 
-NPM now supports OIDC-based trusted publishing, which eliminates the need for storing NPM tokens as secrets. This provides better security by using short-lived, workflow-specific credentials.
+This action uses NPM's OIDC-based trusted publishing, which eliminates the need for storing NPM tokens as secrets. This provides better security by using short-lived, workflow-specific credentials.
 
 ### Prerequisites
 
@@ -180,7 +179,6 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   npm_tag: canary
-                  # npm_token is not required when using OIDC
                   publish_script: pnpm run deploy:canary
                   packages_dir: packages
                   provenance: true

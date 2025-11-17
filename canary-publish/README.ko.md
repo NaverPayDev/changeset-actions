@@ -43,7 +43,6 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}           # (필수) GitHub API 인증 토큰. 필요시 사용자 PAT로 대체 가능
                   npm_tag: canary                                    # (선택) 배포에 사용할 npm 태그 (예: canary, beta 등)
-                  npm_token: ${{ secrets.NPM_TOKEN }}                # (선택) npm publish를 위한 인증 토큰. OIDC 사용 시 불필요
                   publish_script: pnpm run deploy:canary             # (필수) Canary 배포를 실행할 스크립트 명령어
                   packages_dir: packages                             # (선택) 변경 감지에 사용할 패키지 디렉터리 (기본값: packages,share)
                   excludes: ".turbo,.github"                         # (선택) 변경 감지에서 제외할 파일/디렉터리 목록 (쉼표로 구분)
@@ -109,9 +108,9 @@ jobs:
 
 **위 설정이 누락되면 릴리즈 생성이 실패할 수 있습니다. 반드시 확인해 주세요!**
 
-## NPM OIDC 신뢰할 수 있는 게시 사용하기 (권장)
+## NPM OIDC 신뢰할 수 있는 게시
 
-NPM은 이제 OIDC 기반 신뢰할 수 있는 게시를 지원하여, NPM 토큰을 시크릿으로 저장할 필요가 없습니다. 워크플로우별 단기 자격 증명을 사용하여 더 나은 보안을 제공합니다.
+이 액션은 NPM의 OIDC 기반 신뢰할 수 있는 게시를 사용합니다. NPM 토큰을 시크릿으로 저장할 필요가 없으며, 워크플로우별 단기 자격 증명을 사용하여 더 나은 보안을 제공합니다.
 
 ### 사전 요구사항
 
@@ -180,7 +179,6 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   npm_tag: canary
-                  # OIDC 사용 시 npm_token 불필요
                   publish_script: pnpm run deploy:canary
                   packages_dir: packages
                   provenance: true

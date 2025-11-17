@@ -11,9 +11,6 @@ inputs:
         description: 'npm tag'
         default: canary
         required: false
-    npm_token:
-        description: 'npm token (optional if using OIDC trusted publishing)'
-        required: false
     publish_script:
         description: 'canary deploy script'
         required: true
