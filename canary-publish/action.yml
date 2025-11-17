@@ -12,8 +12,8 @@ inputs:
         default: canary
         required: false
     npm_token:
-        description: 'npm token'
-        required: true
+        description: 'npm token (optional if using OIDC trusted publishing)'
+        required: false
     publish_script:
         description: 'canary deploy script'
         required: true
@@ -41,3 +41,7 @@ inputs:
         description: 'language for release note, comment etc.'
         required: false
         default: 'en'
+    provenance:
+        description: 'Enable provenance statements (requires npm CLI 11.5.1+, uses OIDC if available)'
+        required: false
+        default: 'true'
