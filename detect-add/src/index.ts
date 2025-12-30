@@ -76,6 +76,78 @@ async function main() {
         return
     }
 
+    // Fork PR 감지 및 가이드 코멘트 처리
+    const forkGuideEnabled = core.getInput('fork_guide_enabled') === 'true'
+    const isForkPR = pull_request.head?.repo?.fork === true || pull_request.head?.repo?.full_name !== `${owner}/${repo}`
+
+    if (isForkPR) {
+        core.info(
+            isKoreanLanguage
+                ? `Fork PR이 감지되었습니다. (${pull_request.head?.repo?.full_name})`
+                : `Fork PR detected. (${pull_request.head?.repo?.full_name})`,
+        )
+
+        if (forkGuideEnabled) {
+            const customMessage = core.getInput('fork_guide_message')
+            const defaultMessage = `## Changeset Guide for External Contributors
+
+**한국어** | [English](#english)
+
+### 한국어
+
+외부 기여자분께 감사드립니다! 🎉
+
+패키지에 변경사항이 있는 경우, changeset 파일을 수동으로 생성해주세요.
+
+\`\`\`bash
+pnpm changeset
+\`\`\`
+
+위 명령어를 실행하면 변경된 패키지와 버전 타입(patch/minor/major)을 선택하고, 변경 내용을 입력할 수 있습니다.
+
+생성된 \`.changeset/*.md\` 파일을 커밋에 포함해주세요.
+
+> **참고**: \`${skipLabel}\` 레이블이 있으면 changeset이 필요하지 않습니다.
+
+---
+
+<a name="english"></a>
+### English
+
+Thank you for your contribution! 🎉
+
+If your PR includes package changes, please create a changeset file manually.
+
+\`\`\`bash
+pnpm changeset
+\`\`\`
+
+This command will guide you to select the changed packages, version type (patch/minor/major), and enter a description.
+
+Please include the generated \`.changeset/*.md\` file in your commit.
+
+> **Note**: If the \`${skipLabel}\` label is present, changeset is not required.
+
+<!-- ${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM} -->`
+
+            const guideMessage = customMessage || defaultMessage
+            const guideComment = {...commonParams, body: guideMessage}
+
+            if (prevComment !== undefined) {
+                await octokit.rest.issues.updateComment({...guideComment, comment_id: prevComment.id})
+            } else {
+                await octokit.rest.issues.createComment(guideComment)
+            }
+
+            core.info(
+                isKoreanLanguage
+                    ? `Fork PR에 changeset 가이드 코멘트를 추가했습니다.`
+                    : `Added changeset guide comment for fork PR.`,
+            )
+        }
+        return
+    }
+
     /**
      * 변경된 파일 이름을 가져오기위한 api
      */
