@@ -30,3 +30,10 @@ inputs:
         description: 'language to use for the changeset'
         required: false
         default: 'en'
+    fork_guide_enabled:
+        description: 'enable guide comment for fork PRs (fork PRs cannot use auto-detect due to token permissions)'
+        required: false
+        default: 'false'
+    fork_guide_message:
+        description: 'custom guide message for fork PRs (optional, uses default bilingual message if not provided)'
+        required: false
