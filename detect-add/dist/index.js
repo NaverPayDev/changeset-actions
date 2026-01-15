@@ -57400,12 +57400,23 @@ function main() {
 외부 기여자분께 감사드립니다! 🎉
 
 패키지에 변경사항이 있는 경우, changeset 파일을 수동으로 생성해주세요.
+[NaverPayDev에서 제공하는 Claude Code Plugin](https://github.com/NaverPayDev/naverpay-plugins)을 사용하시면 간편하게 changeset 파일을 생성할 수 있습니다.
 
+**marketplace 추가 & changeset plugin 설치**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**사용법**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\`
+
+플러그인을 사용하지 않는다면, 아래 명령어를 실행하면 변경된 패키지와 버전 타입(patch/minor/major)을 선택하고, 변경 내용을 입력할 수 있습니다.
 \`\`\`bash
 pnpm changeset
 \`\`\`
-
-위 명령어를 실행하면 변경된 패키지와 버전 타입(patch/minor/major)을 선택하고, 변경 내용을 입력할 수 있습니다.
 
 생성된 \`.changeset/*.md\` 파일을 커밋에 포함해주세요.
 
@@ -57419,12 +57430,23 @@ pnpm changeset
 Thank you for your contribution! 🎉
 
 If your PR includes package changes, please create a changeset file manually.
+You can easily create changeset files using the [Claude Code Plugin provided by NaverPayDev](https://github.com/NaverPayDev/naverpay-plugins).
 
+**Add marketplace & install changeset plugin**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**Usage**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\`
+
+If you don't use the plugin, you can run the command below to select the changed packages, version type (patch/minor/major), and enter a description.
 \`\`\`bash
 pnpm changeset
 \`\`\`
-
-This command will guide you to select the changed packages, version type (patch/minor/major), and enter a description.
 
 Please include the generated \`.changeset/*.md\` file in your commit.
 
@@ -57549,6 +57571,31 @@ exports.getChangesetEmptyGithubComment = getChangesetEmptyGithubComment;
 const human_id_1 = __nccwpck_require__(6044);
 const constants_1 = __nccwpck_require__(9562);
 const get_release_plan_1 = __nccwpck_require__(6240);
+function getChangesetPluginGuideComment(isKoreanLanguage) {
+    return isKoreanLanguage
+        ? `### Plugin 사용법
+**marketplace 추가 & changeset plugin 설치**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**사용법**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\``
+        : `### Plugin Usage
+**Add marketplace & install changeset plugin**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**Usage**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\``;
+}
 function getNewChangesetTemplate(changedPackageNames, title, prUrl, versionType) {
     const contents = [
         '---',
@@ -57593,6 +57640,9 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
             `🩹 0.0.X  [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
             '',
         ];
+    const pluginGuideComment = hasChangesetMarkdownInPullRequest
+        ? []
+        : [getChangesetPluginGuideComment(isKoreanLanguage), ''];
     const checksumComment = `<sub>powered by: <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add/${isKoreanLanguage ? 'README.ko.md' : 'README.md'}">${constants_1.CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</a></sub>`;
     const packageNames = changedPackages.join('`, `');
     const releasePlanMessage = (0, get_release_plan_1.getReleasePlanMessage)(releasePlan, isKoreanLanguage);
@@ -57608,9 +57658,10 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
             ...labelComment,
             hasChangesetMarkdownInPullRequest
                 ? '**이 PR의 변경 사항은 다음 버전 업데이트에 포함될 예정입니다.**'
-                : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
+                : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택하거나 [NaverPayDev에서 제공하는 Claude Code Plugin](https://github.com/NaverPayDev/naverpay-plugins)을 사용해주세요.**',
             '',
             ...bumpComment,
+            ...pluginGuideComment,
             releasePlanMessage,
             checksumComment,
         ].join('\n');
@@ -57624,9 +57675,10 @@ function getChangedPackagesGithubComment({ changedPackages, pullRequest, isKorea
         ...labelComment,
         hasChangesetMarkdownInPullRequest
             ? '**The changes in this PR will be included in the next version bump.**'
-            : '**If you want to add changes to `.changeset`, please select one of the following options.**',
+            : '**If you want to add changes to `.changeset`, please select one of the following options or use the [Claude Code Plugin provided by NaverPayDev](https://github.com/NaverPayDev/naverpay-plugins).**',
         '',
         ...bumpComment,
+        ...pluginGuideComment,
         releasePlanMessage,
         checksumComment,
     ].join('\n');

@@ -7,6 +7,32 @@ import type {ReleasePlan} from '@changesets/types'
 
 type VERSION = 'major' | 'minor' | 'patch'
 
+function getChangesetPluginGuideComment(isKoreanLanguage: boolean) {
+    return isKoreanLanguage
+        ? `### Plugin 사용법
+**marketplace 추가 & changeset plugin 설치**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**사용법**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\``
+        : `### Plugin Usage
+**Add marketplace & install changeset plugin**
+\`\`\`
+/plugin marketplace add NaverPayDev/naverpay-plugins
+/plugin install changeset@naverpay-plugins
+\`\`\`
+
+**Usage**
+\`\`\`
+/naverpay-plugins:changeset
+\`\`\``
+}
+
 export function getNewChangesetTemplate(
     changedPackageNames: string[],
     title: string,
@@ -86,6 +112,9 @@ export function getChangedPackagesGithubComment({
               `🩹 0.0.X  [patch bump](${getAddChangesetUrl(changedPackages, pullRequest, 'patch')})`,
               '',
           ]
+    const pluginGuideComment = hasChangesetMarkdownInPullRequest
+        ? []
+        : [getChangesetPluginGuideComment(isKoreanLanguage), '']
     const checksumComment = `<sub>powered by: <a href="https://github.com/NaverPayDev/changeset-actions/tree/main/detect-add/${
         isKoreanLanguage ? 'README.ko.md' : 'README.md'
     }">${CHANGESET_DETECT_ADD_ACTIONS_CHECKSUM}</a></sub>`
@@ -106,9 +135,10 @@ export function getChangedPackagesGithubComment({
             ...labelComment,
             hasChangesetMarkdownInPullRequest
                 ? '**이 PR의 변경 사항은 다음 버전 업데이트에 포함될 예정입니다.**'
-                : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택해주세요.**',
+                : '**`.changeset`에 변경사항을 추가하고싶다면 아래에서 하나를 선택하거나 [NaverPayDev에서 제공하는 Claude Code Plugin](https://github.com/NaverPayDev/naverpay-plugins)을 사용해주세요.**',
             '',
             ...bumpComment,
+            ...pluginGuideComment,
             releasePlanMessage,
             checksumComment,
         ].join('\n')
@@ -122,9 +152,10 @@ export function getChangedPackagesGithubComment({
         ...labelComment,
         hasChangesetMarkdownInPullRequest
             ? '**The changes in this PR will be included in the next version bump.**'
-            : '**If you want to add changes to `.changeset`, please select one of the following options.**',
+            : '**If you want to add changes to `.changeset`, please select one of the following options or use the [Claude Code Plugin provided by NaverPayDev](https://github.com/NaverPayDev/naverpay-plugins).**',
         '',
         ...bumpComment,
+        ...pluginGuideComment,
         releasePlanMessage,
         checksumComment,
     ].join('\n')
