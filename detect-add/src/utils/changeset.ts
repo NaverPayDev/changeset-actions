@@ -13,23 +13,23 @@ function getChangesetPluginGuideComment(isKoreanLanguage: boolean) {
 **marketplace 추가 & changeset plugin 설치**
 \`\`\`
 /plugin marketplace add NaverPayDev/naverpay-plugins
-/plugin install changeset@naverpay-plugins
+/plugin install naverpay-changeset@naverpay-plugins
 \`\`\`
 
 **사용법**
 \`\`\`
-/naverpay-plugins:changeset
+/naverpay-changeset:changeset
 \`\`\``
         : `### Plugin Usage
 **Add marketplace & install changeset plugin**
 \`\`\`
 /plugin marketplace add NaverPayDev/naverpay-plugins
-/plugin install changeset@naverpay-plugins
+/plugin install naverpay-changeset@naverpay-plugins
 \`\`\`
 
 **Usage**
 \`\`\`
-/naverpay-plugins:changeset
+/naverpay-changeset:changeset
 \`\`\``
 }
 
