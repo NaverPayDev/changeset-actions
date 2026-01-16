@@ -103,12 +103,12 @@ async function main() {
 **marketplace 추가 & changeset plugin 설치**
 \`\`\`
 /plugin marketplace add NaverPayDev/naverpay-plugins
-/plugin install changeset@naverpay-plugins
+/plugin install naverpay-changeset@naverpay-plugins
 \`\`\`
 
 **사용법**
 \`\`\`
-/naverpay-plugins:changeset
+/naverpay-changeset:changeset
 \`\`\`
 
 플러그인을 사용하지 않는다면, 아래 명령어를 실행하면 변경된 패키지와 버전 타입(patch/minor/major)을 선택하고, 변경 내용을 입력할 수 있습니다.
@@ -133,12 +133,12 @@ You can easily create changeset files using the [Claude Code Plugin provided by 
 **Add marketplace & install changeset plugin**
 \`\`\`
 /plugin marketplace add NaverPayDev/naverpay-plugins
-/plugin install changeset@naverpay-plugins
+/plugin install naverpay-changeset@naverpay-plugins
 \`\`\`
 
 **Usage**
 \`\`\`
-/naverpay-plugins:changeset
+/naverpay-changeset:changeset
 \`\`\`
 
 If you don't use the plugin, you can run the command below to select the changed packages, version type (patch/minor/major), and enter a description.
