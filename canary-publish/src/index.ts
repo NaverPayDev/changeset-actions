@@ -10,7 +10,12 @@ import resolveFrom from 'resolve-from'
 import createFetchers from '$actions/apis'
 import {getChangedAllFiles} from '$actions/utils'
 
-import {getChangedPackages, protectUnchangedPackages, removeChangesetMdFiles} from './utils/file'
+import {
+    getChangedPackages,
+    protectUnchangedPackages,
+    removeChangesetMdFiles,
+    withFixedGroupSiblings,
+} from './utils/file'
 import {setNpmRc} from './utils/npm'
 import {createReleaseForTags, getPublishedPackageInfos} from './utils/publish'
 
@@ -60,11 +65,14 @@ async function main() {
             return
         }
 
+        // fixed 그룹 패키지는 함께 배포되어야 하므로 같은 그룹의 형제 패키지를 포함시킵니다.
+        const packagesToPublish = await withFixedGroupSiblings(changedPackageInfos)
+
         await Promise.all([
             // 이번 변경건과 관련없는 모든 .changeset/*.md 파일을 제거한다.
             removeChangesetMdFiles({changedFiles}),
             // 변경사항외 다른 패키지들의 배포를 막습니다.
-            protectUnchangedPackages(changedPackageInfos),
+            protectUnchangedPackages(packagesToPublish),
         ])
 
         // 패키지 변경 버전 반영
@@ -95,8 +103,8 @@ async function main() {
 
         const packagePathByName: Record<string, string> = {}
 
-        // 변경된 패키지들의 버전을 강제로 치환합니다
-        changedPackageInfos.forEach((packageJsonPath) => {
+        // 배포 대상 패키지들의 버전을 강제로 치환합니다
+        packagesToPublish.forEach((packageJsonPath) => {
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
             const today = new Date()

@@ -65,6 +65,62 @@ export async function protectUnchangedPackages(changedPackages: string[]) {
     }
 }
 
+interface ChangesetConfig {
+    fixed?: string[][]
+}
+
+// Members of a changesets `fixed` group are published together, so an untouched
+// sibling of a changed package must publish too — not be marked private.
+export async function withFixedGroupSiblings(changedPackages: string[]): Promise<string[]> {
+    let fixedGroups: string[][]
+
+    try {
+        const config = JSON.parse(fs.readFileSync('.changeset/config.json', 'utf8')) as ChangesetConfig
+
+        fixedGroups = config.fixed ?? []
+    } catch {
+        return changedPackages
+    }
+
+    if (fixedGroups.length === 0) {
+        return changedPackages
+    }
+
+    const allPackageJSON = await getAllPackageJSON()
+    const pathByName = new Map<string, string>()
+
+    for (const packageJsonPath of allPackageJSON) {
+        const {name} = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+
+        if (typeof name === 'string') {
+            pathByName.set(name, packageJsonPath)
+        }
+    }
+
+    const changedPaths = new Set(changedPackages)
+    const expanded = new Set(changedPackages)
+
+    for (const group of fixedGroups) {
+        const groupTouchesChange = group.some((name) => {
+            const packageJsonPath = pathByName.get(name)
+
+            return packageJsonPath != null && changedPaths.has(packageJsonPath)
+        })
+
+        if (groupTouchesChange) {
+            for (const name of group) {
+                const packageJsonPath = pathByName.get(name)
+
+                if (packageJsonPath != null) {
+                    expanded.add(packageJsonPath)
+                }
+            }
+        }
+    }
+
+    return Array.from(expanded)
+}
+
 export async function removeChangesetMdFiles({
     changedFiles,
 }: {

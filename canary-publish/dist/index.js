@@ -53319,11 +53319,13 @@ function main() {
                 core.info('No changed packages found.');
                 return;
             }
+            // fixed 그룹 패키지는 함께 배포되어야 하므로 같은 그룹의 형제 패키지를 포함시킵니다.
+            const packagesToPublish = yield (0, file_1.withFixedGroupSiblings)(changedPackageInfos);
             yield Promise.all([
                 // 이번 변경건과 관련없는 모든 .changeset/*.md 파일을 제거한다.
                 (0, file_1.removeChangesetMdFiles)({ changedFiles }),
                 // 변경사항외 다른 패키지들의 배포를 막습니다.
-                (0, file_1.protectUnchangedPackages)(changedPackageInfos),
+                (0, file_1.protectUnchangedPackages)(packagesToPublish),
             ]);
             // 패키지 변경 버전 반영
             yield (0, exec_1.exec)('node', [(0, resolve_from_1.default)(cwd, '@changesets/cli/bin.js'), 'version'], {
@@ -53348,8 +53350,8 @@ function main() {
             fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2), 'utf8');
             const versionTemplate = core.getInput('version_template');
             const packagePathByName = {};
-            // 변경된 패키지들의 버전을 강제로 치환합니다
-            changedPackageInfos.forEach((packageJsonPath) => {
+            // 배포 대상 패키지들의 버전을 강제로 치환합니다
+            packagesToPublish.forEach((packageJsonPath) => {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                 const today = new Date();
                 const pad = (n) => n.toString().padStart(2, '0');
@@ -53463,6 +53465,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangedPackages = getChangedPackages;
 exports.getAllPackageJSON = getAllPackageJSON;
 exports.protectUnchangedPackages = protectUnchangedPackages;
+exports.withFixedGroupSiblings = withFixedGroupSiblings;
 exports.removeChangesetMdFiles = removeChangesetMdFiles;
 const core = __importStar(__nccwpck_require__(6108));
 const fast_glob_1 = __importDefault(__nccwpck_require__(6014));
@@ -53509,6 +53512,49 @@ function protectUnchangedPackages(changedPackages) {
                 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
             }
         }
+    });
+}
+// Members of a changesets `fixed` group are published together, so an untouched
+// sibling of a changed package must publish too — not be marked private.
+function withFixedGroupSiblings(changedPackages) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        let fixedGroups;
+        try {
+            const config = JSON.parse(fs.readFileSync('.changeset/config.json', 'utf8'));
+            fixedGroups = (_a = config.fixed) !== null && _a !== void 0 ? _a : [];
+        }
+        catch (_b) {
+            return changedPackages;
+        }
+        if (fixedGroups.length === 0) {
+            return changedPackages;
+        }
+        const allPackageJSON = yield getAllPackageJSON();
+        const pathByName = new Map();
+        for (const packageJsonPath of allPackageJSON) {
+            const { name } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+            if (typeof name === 'string') {
+                pathByName.set(name, packageJsonPath);
+            }
+        }
+        const changedPaths = new Set(changedPackages);
+        const expanded = new Set(changedPackages);
+        for (const group of fixedGroups) {
+            const groupTouchesChange = group.some((name) => {
+                const packageJsonPath = pathByName.get(name);
+                return packageJsonPath != null && changedPaths.has(packageJsonPath);
+            });
+            if (groupTouchesChange) {
+                for (const name of group) {
+                    const packageJsonPath = pathByName.get(name);
+                    if (packageJsonPath != null) {
+                        expanded.add(packageJsonPath);
+                    }
+                }
+            }
+        }
+        return Array.from(expanded);
     });
 }
 function removeChangesetMdFiles(_a) {
